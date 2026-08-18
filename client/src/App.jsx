@@ -9,14 +9,12 @@ import Login from "./components/User/Login";
 import Homepage from "./components/Home/HomePage";
 import Courses from "./components/Courses/Courses";
 import CoursePlayer from "./components/Courses/CoursePlayer";
-import TestCourses from "./components/Courses/TestCourses";
 import Settings from "./components/User/SettingsPage";
-import ONetCareerAssessment from "./components/Home/ONetCareerAssessment";
 import FloatingChatbot from "./components/Chatbot/FloatingChatbot";
 
 // Navigation Components
 import PublicNavbar from "./components/Navbar/PublicNavbar";
-import PrivateNavbar from "./components/Navbar/PrivateNavbarNew";
+import PrivateNavbar from "./components/Navbar/PrivateNavbar";
 import InstructorNavbar from "./components/Navbar/InstructorNavbar";
 
 // Route Protection
@@ -64,8 +62,6 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/courses" element={<Courses />} />
-        <Route path="/test-courses" element={<TestCourses />} />
-        <Route path="/assessment" element={<ONetCareerAssessment />} />
         
         {/* Course Player - protected */}
         <Route
