@@ -22,12 +22,14 @@ export const generatePersonalizedQuestions = async (
   numQuestions = 20,
   currentQuestionIndex = 0
 ) => {
-  try {
-    // Find the dominant interest category
-    const dominantInterest = Object.keys(interestScores).reduce((a, b) => 
+  let dominantInterest = "technology";
+  if (interestScores && Object.keys(interestScores).length > 0) {
+    dominantInterest = Object.keys(interestScores).reduce((a, b) => 
       interestScores[a] > interestScores[b] ? a : b
     );
+  }
 
+  try {
     // Create context from previous answers for progressive generation
     const progressiveContext = buildProgressiveContext(previousAnswers, currentQuestionIndex);
 

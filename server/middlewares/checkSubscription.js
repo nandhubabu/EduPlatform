@@ -1,3 +1,6 @@
+const asyncHandler = require("express-async-handler");
+const User = require("../models/User");
+
 const checkSubscription = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
@@ -16,3 +19,5 @@ const checkSubscription = asyncHandler(async (req, res, next) => {
     .status(403)
     .json({ message: "API request limit reached or trial period expired" });
 });
+
+module.exports = checkSubscription;

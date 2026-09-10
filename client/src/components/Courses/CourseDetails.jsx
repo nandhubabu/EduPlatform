@@ -21,6 +21,7 @@ import {
   getSingleCourseAPI,
   startCourseAPI,
 } from "../../reactQuery/courses/coursesAPI";
+import { deleteSectionAPI } from "../../reactQuery/courseSections/courseSectionsAPI";
 import AlertMessage from "../Alert/AlertMessage";
 import { useSelector } from "react-redux";
 
@@ -32,13 +33,13 @@ const CourseDetail = ({ course }) => {
     data: courseData,
     error,
     isLoading,
+    refetch,
   } = useQuery({
     queryKey: ["course"],
     queryFn: () => getSingleCourseAPI(courseId),
   });
 
   //start course mutation
-
   const startCourseMutation = useMutation({
     mutationKey: ["start-course"],
     mutationFn: startCourseAPI,
@@ -48,12 +49,21 @@ const CourseDetail = ({ course }) => {
     startCourseMutation.mutate({ courseId });
   };
 
+  //delete section mutation
+  const deleteMutation = useMutation({
+    mutationFn: deleteSectionAPI,
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
+  const handleDelete = (sectionId) => {
+    deleteMutation.mutate(sectionId);
+  };
+
   //Get the auth user
-
   const userProfile = useSelector((state) => state.auth.userProfile);
-
-  // const isInstructor = courseData?.instructor.id === userProfile.id;
-  const isStudent = userProfile.role === "student";
+  const isStudent = userProfile?.role === "student";
 
   return (
     <>

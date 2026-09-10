@@ -1,11 +1,12 @@
 const asyncHandler = require("express-async-handler");
+const User = require("../models/User");
 // This is a webhook handler for Stripe payment success
 const stripeWebhookHandler = asyncHandler(async (req, res) => {
   const event = req.body;
 
   // Handle the event
   switch (event.type) {
-    case "payment_intent.succeeded":
+    case "payment_intent.succeeded": {
       const paymentIntent = event.data.object; // contains data about the payment
       const userId = paymentIntent.metadata.userId; // assuming you pass the user ID in metadata
 
@@ -18,6 +19,7 @@ const stripeWebhookHandler = asyncHandler(async (req, res) => {
       // Return a response to acknowledge receipt of the event
       res.json({ received: true });
       break;
+    }
     // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);

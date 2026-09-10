@@ -47,7 +47,7 @@ export default function App() {
       case "student":
         return PrivateNavbar;
       default:
-        return PublicNavbar;
+        return PrivateNavbar;
     }
   };
 
