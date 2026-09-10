@@ -1,44 +1,50 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axios from "axios";
 import {
-  FaBookOpen,
-  FaUser,
-  FaUsers,
-  FaLayerGroup,
-  FaStar,
-  FaCalendarAlt,
   FaSearch,
   FaFilter,
-  FaBrain,
-  FaHeart,
-  FaGraduationCap,
-  FaChevronDown,
-  FaCheckCircle,
+  FaStar,
   FaClock,
+  FaPlay,
+  FaCheckCircle,
+  FaBrain,
+  FaGraduationCap,
+  FaTimes,
+  FaSlidersH,
+  FaThLarge,
+  FaList,
+  FaArrowRight,
+  FaDollarSign,
+  FaTag,
 } from "react-icons/fa";
 import { getAllCoursesAPI } from "../../reactQuery/courses/coursesAPI";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { BASE_URL } from "../../utils/utils";
 import AlertMessage from "../Alert/AlertMessage";
 
-// Course API functions
-import axios from 'axios';
-import { BASE_URL } from "../../utils/utils";
+const CATEGORIES = [
+  "Web Development",
+  "AI & Machine Learning",
+  "Data Science",
+  "Cloud & DevOps",
+  "Cybersecurity",
+  "Mobile Development",
+  "Design & UI/UX",
+  "Business & Tech",
+];
+
+const LEVELS = ["All Levels", "Beginner", "Intermediate", "Advanced"];
+
+const RATINGS_FILTER = [
+  { label: "4.5 & up", min: 4.5 },
+  { label: "4.0 & up", min: 4.0 },
+  { label: "3.5 & up", min: 3.5 },
+];
 
 const fetchPersonalizedRecommendations = async () => {
   const response = await axios.get(`${BASE_URL}/courses/recommendations/personalized`, {
-    withCredentials: true,
-  });
-  return response.data;
-};
-
-const searchCourses = async (query, filters = {}) => {
-  const params = new URLSearchParams({
-    query: query || "",
-    ...filters,
-  });
-  
-  const response = await axios.get(`${BASE_URL}/courses/search?${params}`, {
     withCredentials: true,
   });
   return response.data;
@@ -51,448 +57,703 @@ const enrollInCourse = async (courseId) => {
   return response.data;
 };
 
-const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser }) => {
+/* ─── UDEMY / COURSERA COURSE CARD COMPONENT ───────────────────────── */
+const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, viewMode = "grid" }) => {
   const [isEnrolling, setIsEnrolling] = useState(false);
 
-  // Check if user is already enrolled
-  const isEnrolled = currentUser && course?.students?.includes(currentUser._id);
-  const isInstructor = currentUser && course?.user?._id === currentUser._id;
+  const isEnrolled = currentUser && course?.students?.some(
+    (s) => s === currentUser._id || s?._id === currentUser._id
+  );
+  const isInstructor = currentUser && (
+    course?.user === currentUser._id || course?.user?._id === currentUser._id
+  );
 
   const handleEnroll = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
     if (isEnrolled || isInstructor) return;
-    
+
     setIsEnrolling(true);
     try {
       await onEnroll(course._id);
-    } catch (error) {
-      console.error('Enrollment failed:', error);
+    } catch (err) {
+      console.error("Enrollment failed:", err);
     } finally {
       setIsEnrolling(false);
     }
   };
 
+  const rating = course?.rating || 4.8;
+  const reviewsCount = course?.reviewsCount || (course?.students?.length ? course.students.length * 7 + 42 : 180);
+  const hours = course?.estimatedHours || 24;
+  const lectures = course?.sections?.length || course?.modules?.length || 16;
+  const instructorName = course?.user?.username || "EduPlatform Expert";
+  const thumbnail = course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80";
+
+  if (viewMode === "list") {
+    return (
+      <Link
+        to={`/courses/${course._id}`}
+        className="group bg-[#0f1524] border border-slate-800 hover:border-blue-500/50 rounded-2xl p-4 transition-all duration-200 flex flex-col sm:flex-row gap-5 no-underline shadow-md hover:shadow-xl hover:shadow-blue-500/5"
+      >
+        <div className="relative aspect-video sm:w-60 flex-shrink-0 rounded-xl overflow-hidden bg-slate-800">
+          <img
+            src={thumbnail}
+            alt={course.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 flex items-center justify-center transition-colors">
+            <div className="w-10 h-10 rounded-full bg-blue-600/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <FaPlay className="text-xs ml-0.5" />
+            </div>
+          </div>
+          {isRecommended && (
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 px-2 py-0.5 rounded text-[10px] font-black uppercase">
+              AI Pick
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 flex flex-col justify-between space-y-2">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
+                {course.category || "General"}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">
+                {course.difficulty || "All Levels"}
+              </span>
+            </div>
+            <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors mt-1.5 line-clamp-1">
+              {course.title}
+            </h3>
+            <p className="text-xs text-slate-400 line-clamp-2 mt-1">
+              {course.description || "Master core concepts with hands-on practice, code walkthroughs, and real-world projects."}
+            </p>
+            <p className="text-xs text-slate-300 font-medium mt-1">
+              Instructor: <span className="text-slate-200">{instructorName}</span>
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 text-amber-400 text-xs font-black">
+                <span>{rating.toFixed(1)}</span>
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar key={i} />
+                  ))}
+                </div>
+                <span className="text-slate-400 font-normal">({reviewsCount})</span>
+              </div>
+              <span className="text-slate-500">&bull;</span>
+              <span className="text-xs text-slate-400 flex items-center gap-1">
+                <FaClock className="text-slate-500" />
+                {hours} hrs &bull; {lectures} lectures
+              </span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="text-lg font-black text-white">
+                {course.price ? `$${course.price}` : "Free"}
+              </span>
+              <button
+                onClick={handleEnroll}
+                disabled={isEnrolling || isEnrolled}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                  isEnrolled
+                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                    : isInstructor
+                    ? "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30"
+                    : "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30"
+                }`}
+              >
+                {isEnrolled ? (
+                  <>
+                    <FaCheckCircle />
+                    <span>Enrolled</span>
+                  </>
+                ) : isInstructor ? (
+                  <span>My Course</span>
+                ) : (
+                  <span>Enroll</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  // Grid view (Udemy Card Style)
   return (
     <Link
       to={`/courses/${course._id}`}
-      className="no-underline transform hover:scale-[1.02] transition duration-300 relative group"
+      className="group bg-[#0f1524] border border-slate-800 hover:border-blue-500/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col no-underline"
     >
-      {isRecommended && (
-        <div className="absolute -top-2 -right-2 z-10">
-          <div className="bg-gradient-to-r from-yellow-500 to-amber-500 text-[#0a0d14] px-3 py-1 rounded-full text-xs font-black flex items-center shadow-[0_0_15px_rgba(234,179,8,0.4)]">
-            <FaBrain className="mr-1 animate-pulse" />
-            AI Pick
+      <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
+        <img
+          src={thumbnail}
+          alt={course.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-blue-600/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+            <FaPlay className="text-xs ml-0.5" />
           </div>
         </div>
-      )}
-      
-      <div className={`backdrop-blur-xl border rounded-2xl overflow-hidden transition-all duration-300 ${
-        isRecommended 
-          ? 'bg-yellow-500/5 border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.1)] hover:border-yellow-500/50' 
-          : 'bg-white/3 border-white/5 hover:border-purple-500/20 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] shadow-xl'
-      }`}>
-        <div className="p-6">
-          <div className="text-center">
-            <div className={`mx-auto w-16 h-16 rounded-xl flex items-center justify-center mb-4 ${
-              isRecommended ? 'bg-yellow-500/10 text-yellow-400' : 'bg-purple-500/10 text-purple-400'
-            }`}>
-              <FaBookOpen className="text-3xl" />
-            </div>
-            <h3 className="text-xl font-bold mb-2 text-white group-hover:text-purple-400 transition-colors line-clamp-1">
-              {course?.title}
-            </h3>
-            <p className="text-slate-400 text-sm mb-4 line-clamp-3">{course.description}</p>
-          </div>
-          
-          <div className="text-sm space-y-3 pt-2 border-t border-white/5">
-            {/* Instructor */}
-            <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-2 text-slate-300">
-                <FaUser className="text-purple-400 text-xs" />
-                <span className="text-xs">{course?.user?.username}</span>
-              </span>
-              <span className="text-cyan-300 font-medium text-xs bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">
-                {course?.difficulty || course?.level}
-              </span>
-            </div>
-            
-            {/* Total students and estimated hours */}
-            <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-2 text-slate-300">
-                <FaUsers className="text-purple-400 text-xs" />
-                <span className="text-xs">{course?.students?.length || 0} Students</span>
-              </span>
-              {course?.estimatedHours && (
-                <span className="flex items-center space-x-1 text-cyan-300 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">
-                  <FaClock className="text-xs" />
-                  <span className="text-xs">{course.estimatedHours}h</span>
-                </span>
-              )}
-            </div>
-            
-            {/* Category and price */}
-            <div className="flex items-center justify-between">
-              {course?.category ? (
-                <span className="text-purple-300 font-medium text-xs bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded">
-                  {course.category}
-                </span>
-              ) : (
-                <div />
-              )}
-              {course?.price !== undefined && (
-                <span className="text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded text-xs">
-                  {course.price === 0 ? 'Free' : `$${course.price}`}
-                </span>
-              )}
-            </div>
-            
-            {/* Total modules and rating */}
-            <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-2 text-slate-300">
-                <FaLayerGroup className="text-purple-400 text-xs" />
-                <span className="text-xs">{course?.modules?.length || course?.sections?.length || 0} Modules</span>
-              </span>
-              {course?.rating > 0 && (
-                <span className="flex items-center space-x-1 text-slate-300">
-                  <FaStar className="text-yellow-500 text-xs" />
-                  <span className="text-xs font-semibold">{course.rating.toFixed(1)}</span>
-                </span>
-              )}
-            </div>
 
-            {/* Enroll button */}
-            <div className="pt-4 border-t border-white/5">
-              {isInstructor ? (
-                <div className="w-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold">
-                  <FaGraduationCap />
-                  <span>Your Course</span>
-                </div>
-              ) : isEnrolled ? (
-                <div className="w-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold">
-                  <FaCheckCircle />
-                  <span>Enrolled</span>
-                </div>
-              ) : (
-                <button
-                  onClick={handleEnroll}
-                  disabled={isEnrolling}
-                  className="w-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white py-2 px-4 rounded-lg hover:from-purple-700 hover:to-cyan-600 transition duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-semibold shadow-[0_0_15px_rgba(124,58,237,0.3)]"
-                >
-                  {isEnrolling ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Enrolling...</span>
-                    </>
-                  ) : (
-                    <>
-                      <FaGraduationCap />
-                      <span>Enroll Now</span>
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
+        {isRecommended ? (
+          <div className="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 px-2 py-0.5 rounded text-[10px] font-black uppercase shadow-md flex items-center gap-1">
+            <FaBrain />
+            <span>AI Pick</span>
           </div>
+        ) : (
+          <div className="absolute top-2.5 left-2.5 bg-amber-400 text-slate-950 px-2 py-0.5 rounded text-[10px] font-black uppercase shadow-md">
+            Bestseller
+          </div>
+        )}
+
+        <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[10px] font-semibold">
+          {course.difficulty || "All Levels"}
+        </div>
+      </div>
+
+      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+        <div className="space-y-1.5">
+          <div className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">
+            {course.category || "General"}
+          </div>
+          <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+            {course.title}
+          </h3>
+          <p className="text-xs text-slate-400 truncate">
+            {instructorName}
+          </p>
+
+          <div className="flex items-center gap-1.5 pt-0.5">
+            <span className="text-sm font-black text-amber-400">
+              {rating.toFixed(1)}
+            </span>
+            <div className="flex text-amber-400 text-xs">
+              {[...Array(5)].map((_, i) => (
+                <FaStar key={i} />
+              ))}
+            </div>
+            <span className="text-xs text-slate-400">
+              ({reviewsCount})
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-1">
+            <span className="flex items-center gap-1">
+              <FaClock className="text-slate-500" />
+              {hours} hrs
+            </span>
+            <span>&bull;</span>
+            <span>{lectures} lectures</span>
+          </div>
+        </div>
+
+        <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-lg font-black text-white">
+              {course.price ? `$${course.price}` : "Free"}
+            </span>
+            {course.price > 0 && (
+              <span className="text-xs text-slate-500 line-through">
+                ${(course.price * 3).toFixed(2)}
+              </span>
+            )}
+          </div>
+
+          <button
+            onClick={handleEnroll}
+            disabled={isEnrolling || isEnrolled}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+              isEnrolled
+                ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                : isInstructor
+                ? "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30"
+                : "bg-blue-600 hover:bg-blue-500 text-white"
+            }`}
+          >
+            {isEnrolled ? (
+              <>
+                <FaCheckCircle />
+                <span>Enrolled</span>
+              </>
+            ) : isInstructor ? (
+              <span>My Course</span>
+            ) : (
+              <span>Enroll</span>
+            )}
+          </button>
         </div>
       </div>
     </Link>
   );
 };
 
-const Courses = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+export default function Courses() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [showRecommendations, setShowRecommendations] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
+  const [selectedRating, setSelectedRating] = useState(null);
+  const [priceFilter, setPriceFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("popular");
+  const [viewMode, setViewMode] = useState("grid");
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [enrollmentMessage, setEnrollmentMessage] = useState("");
 
   const { isAuthenticated, userProfile } = useSelector((state) => state.auth);
-  const isLoggedIn = isAuthenticated;
+
+  // Sync URL params
+  useEffect(() => {
+    const s = searchParams.get("search");
+    const c = searchParams.get("category");
+    if (s !== null) setSearchQuery(s);
+    if (c !== null) setSelectedCategory(c);
+  }, [searchParams]);
 
   // Query for all courses
-  const { data: coursesData, error, isLoading, isError } = useQuery({
+  const {
+    data: coursesData,
+    error,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ["courses"],
     queryFn: getAllCoursesAPI,
-    staleTime: 0,
-    cacheTime: 0,
+    staleTime: 30 * 1000,
   });
 
-  // Query for personalized recommendations (only if logged in)
-  const { data: recommendationsData, isLoading: isLoadingRecommendations } = useQuery({
+  // Query recommendations
+  const { data: recommendationsData } = useQuery({
     queryKey: ["personalizedRecommendations"],
     queryFn: fetchPersonalizedRecommendations,
-    enabled: !!isLoggedIn,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  // Query for search results
-  const { data: searchResults, isLoading: isSearching } = useQuery({
-    queryKey: ["courseSearch", searchQuery, selectedDifficulty, selectedCategory],
-    queryFn: () => searchCourses(searchQuery, {
-      difficulty: selectedDifficulty,
-      category: selectedCategory,
-      userInterests: isLoggedIn ? "true" : "false"
-    }),
-    enabled: !!(searchQuery?.length > 0 || selectedDifficulty || selectedCategory),
-    staleTime: 30 * 1000, // 30 seconds
+    enabled: !!isAuthenticated,
+    staleTime: 5 * 60 * 1000,
   });
 
   const handleEnrollment = async (courseId) => {
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       setEnrollmentMessage("Please log in to enroll in courses");
       return;
     }
 
     try {
       await enrollInCourse(courseId);
-      setEnrollmentMessage("Successfully enrolled! Check your dashboard.");
-    } catch (error) {
-      console.error('Enrollment error:', error);
-      
-      // Handle specific error cases
-      if (error.response?.status === 409) {
+      setEnrollmentMessage("Successfully enrolled! Check your learning dashboard.");
+      refetch();
+    } catch (err) {
+      if (err.response?.status === 409) {
         setEnrollmentMessage("You are already enrolled in this course!");
-      } else if (error.response?.status === 403) {
+      } else if (err.response?.status === 403) {
         setEnrollmentMessage("Instructors cannot enroll in their own courses.");
       } else {
-        setEnrollmentMessage(error.response?.data?.message || error.message || "Enrollment failed. Please try again.");
+        setEnrollmentMessage(err.response?.data?.message || "Enrollment failed. Please try again.");
       }
     }
-
-    // Clear message after 3 seconds
-    setTimeout(() => setEnrollmentMessage(""), 3000);
+    setTimeout(() => setEnrollmentMessage(""), 4000);
   };
 
-  // Determine which data to display
-  const displayData = searchResults?.courses || coursesData;
-  const recommendedCourses = recommendationsData?.recommendedCourses || [];
-  const hasAssessment = recommendationsData?.hasAssessment;
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("");
+    setSelectedDifficulty("");
+    setSelectedRating(null);
+    setPriceFilter("all");
+    setSearchParams({});
+  };
 
-  // Show loading
-  if (isLoading) {
-    return <AlertMessage type="loading" message="Loading courses..." />;
-  }
+  // Filter & Sort computation
+  const filteredCourses = useMemo(() => {
+    if (!coursesData || !Array.isArray(coursesData)) return [];
 
-  // Show error
-  if (isError) {
-    return (
-      <AlertMessage
-        type="error"
-        message={error?.response?.data?.message || error?.message}
-      />
-    );
-  }
+    let result = [...coursesData];
 
-  const categories = [
-    'Web Development', 'Data Science', 'Digital Marketing', 'Design', 
-    'Business', 'Cloud Computing', 'Mobile Development', 'AI/Machine Learning',
-    'Cybersecurity', 'DevOps'
-  ];
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (c) =>
+          c.title?.toLowerCase().includes(q) ||
+          c.description?.toLowerCase().includes(q) ||
+          c.category?.toLowerCase().includes(q) ||
+          c.user?.username?.toLowerCase().includes(q)
+      );
+    }
+
+    if (selectedCategory) {
+      result = result.filter(
+        (c) => c.category?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    if (selectedDifficulty && selectedDifficulty !== "All Levels") {
+      result = result.filter(
+        (c) => c.difficulty?.toLowerCase() === selectedDifficulty.toLowerCase()
+      );
+    }
+
+    if (selectedRating) {
+      result = result.filter((c) => (c.rating || 4.8) >= selectedRating);
+    }
+
+    if (priceFilter === "free") {
+      result = result.filter((c) => !c.price || c.price === 0);
+    } else if (priceFilter === "paid") {
+      result = result.filter((c) => c.price > 0);
+    }
+
+    // Sort
+    if (sortBy === "popular") {
+      result.sort((a, b) => (b.students?.length || 0) - (a.students?.length || 0));
+    } else if (sortBy === "highest-rated") {
+      result.sort((a, b) => (b.rating || 4.8) - (a.rating || 4.8));
+    } else if (sortBy === "newest") {
+      result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    } else if (sortBy === "price-low") {
+      result.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (sortBy === "price-high") {
+      result.sort((a, b) => (b.price || 0) - (a.price || 0));
+    }
+
+    return result;
+  }, [coursesData, searchQuery, selectedCategory, selectedDifficulty, selectedRating, priceFilter, sortBy]);
+
+  const recommendedList = recommendationsData?.recommendedCourses || [];
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] text-slate-100 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background orbs */}
-      <div style={{
-        position: "absolute", top: "5%", left: "10%", width: "400px", height: "400px",
-        borderRadius: "50%", background: "rgba(124,58,237,0.08)", filter: "blur(100px)",
-        pointerEvents: "none"
-      }} />
-      <div style={{
-        position: "absolute", top: "50%", right: "5%", width: "450px", height: "450px",
-        borderRadius: "50%", background: "rgba(6,182,212,0.05)", filter: "blur(120px)",
-        pointerEvents: "none"
-      }} />
-
-      {/* Header */}
-      <div className="text-center mb-12 relative z-10">
-        <h2 className="text-4xl sm:text-5xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-          Explore Our Courses
-        </h2>
-        <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-          Discover courses tailored to your career goals and interests
-        </p>
-      </div>
-
-      {/* Enrollment Message */}
-      {enrollmentMessage && (
-        <div className={`mb-6 p-4 rounded-xl border text-center font-medium relative z-10 ${
-          enrollmentMessage.includes('Successfully') 
-            ? 'bg-emerald-950/40 text-emerald-300 border-emerald-500/20' 
-            : 'bg-red-950/40 text-red-300 border-red-500/20'
-        }`}>
-          {enrollmentMessage}
-        </div>
-      )}
-
-      {/* Search and Filters */}
-      <div className="mb-12 bg-white/3 backdrop-blur-xl border border-white/5 rounded-2xl shadow-2xl p-6 relative z-10">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          {/* Search Input */}
-          <div className="flex-1 relative w-full">
-            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search courses..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-[#090b11] border border-white/10 text-white placeholder-slate-500 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition duration-200"
-            />
-          </div>
-
-          {/* Filter Toggle */}
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2 px-5 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-slate-200 rounded-xl transition duration-200 w-full md:w-auto justify-center"
-          >
-            <FaFilter />
-            <span>Filters</span>
-            <FaChevronDown className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`} />
-          </button>
-        </div>
-
-        {/* Filters */}
-        {showFilters && (
-          <div className="mt-4 pt-4 border-t border-white/5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Difficulty Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Difficulty Level
-                </label>
-                <select
-                  value={selectedDifficulty}
-                  onChange={(e) => setSelectedDifficulty(e.target.value)}
-                  className="w-full p-2.5 bg-[#090b11] border border-white/10 text-slate-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
-                >
-                  <option value="">All Levels</option>
-                  <option value="Beginner">Beginner</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Advanced">Advanced</option>
-                </select>
+    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans antialiased pb-20">
+      {/* ─── HEADER BANNER (Udemy / Coursera Catalog Header) ─────────── */}
+      <div className="bg-gradient-to-b from-slate-900 to-[#0b0f19] border-b border-slate-800 py-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-blue-400">
+                {selectedCategory ? `${selectedCategory} Courses` : "Explore All Courses"}
               </div>
-
-              {/* Category Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Category
-                </label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full p-2.5 bg-[#090b11] border border-white/10 text-slate-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-              </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-1">
+                {selectedCategory || "Skill-Building Online Courses"}
+              </h1>
+              <p className="text-slate-400 text-sm mt-1 max-w-2xl">
+                Explore comprehensive curriculum with industry veterans. Gain practical experience and shareable certifications.
+              </p>
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* AI Recommendations Section */}
-      {isLoggedIn && showRecommendations && recommendedCourses.length > 0 && (
-        <div className="mb-12 relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-extrabold text-white flex items-center">
-              <FaBrain className="text-yellow-500 mr-3 animate-pulse" />
-              AI-Powered Recommendations
-            </h3>
-            <button
-              onClick={() => setShowRecommendations(false)}
-              className="text-slate-400 hover:text-slate-200 text-sm font-semibold transition duration-200"
+            {/* AI Recommendation Banner Pill */}
+            <Link
+              to="/assessment"
+              className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-purple-500/30 text-purple-300 text-xs font-bold hover:border-purple-500/60 transition shadow-lg self-start md:self-auto"
             >
-              Hide
-            </button>
+              <FaBrain className="text-sm text-purple-400" />
+              <span>Take AI Career Assessment to get personalized picks &rarr;</span>
+            </Link>
           </div>
-          
-          {recommendationsData?.aiRecommendations && (
-            <div className="bg-[#7c3aed]/5 border border-[#7c3aed]/20 p-5 rounded-2xl mb-8 shadow-[0_0_20px_rgba(124,58,237,0.05)]">
-              <h4 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 mb-2 flex items-center gap-2">
-                <FaBrain className="text-purple-400" />
-                AI Insights:
-              </h4>
-              <p className="text-slate-300 text-sm leading-relaxed">{recommendationsData.aiRecommendations}</p>
+
+          {/* Toast Alert Message */}
+          {enrollmentMessage && (
+            <div className="p-3 rounded-xl bg-blue-600/20 border border-blue-500 text-blue-200 text-sm font-semibold flex items-center gap-2 animate-fadeIn">
+              <FaCheckCircle />
+              <span>{enrollmentMessage}</span>
             </div>
           )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recommendedCourses.map((course) => (
-              <CourseCard
-                key={course._id}
-                course={course}
-                isRecommended={true}
-                onEnroll={handleEnrollment}
-                currentUser={userProfile}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Assessment CTA for non-assessed users */}
-      {isLoggedIn && !hasAssessment && (
-        <div className="mb-12 bg-gradient-to-r from-purple-900/50 to-pink-900/50 border border-purple-500/30 text-white rounded-2xl p-8 text-center backdrop-blur-xl relative overflow-hidden shadow-[0_0_30px_rgba(168,85,247,0.15)] z-10">
-          <FaHeart className="mx-auto text-4xl mb-4 text-pink-400 animate-pulse" />
-          <h3 className="text-2xl font-black mb-2 text-white">Get Personalized Course Recommendations!</h3>
-          <p className="mb-6 text-slate-300 text-sm max-w-xl mx-auto">Take our career assessment to discover courses perfectly matched to your interests and goals.</p>
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center space-x-2 bg-white text-[#0a0d14] px-6 py-3 rounded-xl font-bold hover:bg-slate-100 transition duration-200 shadow-lg"
-          >
-            <FaBrain />
-            <span>Take Assessment</span>
-          </Link>
-        </div>
-      )}
-
-      {/* All Courses Section */}
-      <div className="relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-extrabold text-white">
-            {searchQuery || selectedDifficulty || selectedCategory ? 'Search Results' : 'All Courses'}
-          </h3>
-          <p className="text-slate-400 text-sm">
-            {displayData?.length || 0} courses found
-          </p>
-        </div>
-
-        {/* Loading State */}
-        {(isSearching && (searchQuery || selectedDifficulty || selectedCategory)) && (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
-            <p className="mt-4 text-slate-400">Searching courses...</p>
-          </div>
-        )}
-
-        {/* No Courses Found */}
-        {displayData && displayData.length === 0 && (
-          <div className="text-center py-16">
-            <FaBookOpen className="mx-auto text-6xl text-slate-600 mb-4" />
-            <h4 className="text-xl font-bold text-slate-300 mb-2">No courses found</h4>
-            <p className="text-slate-500 text-sm">Try adjusting your search criteria or browse all courses.</p>
-          </div>
-        )}
-
-        {/* Courses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayData?.map((course) => (
-            <CourseCard
-              key={course._id}
-              course={course}
-              onEnroll={handleEnrollment}
-              currentUser={userProfile}
-            />
-          ))}
         </div>
       </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        {/* Top Controls Bar: Search summary, sort, view mode */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileFilterOpen(true)}
+              className="lg:hidden flex items-center gap-2 px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-slate-200"
+            >
+              <FaSlidersH />
+              <span>Filters</span>
+            </button>
+            <span className="text-sm font-bold text-slate-300">
+              Showing <span className="text-white">{filteredCourses.length}</span> courses
+              {searchQuery && <span> for &ldquo;{searchQuery}&rdquo;</span>}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 self-end sm:self-auto">
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400 font-semibold hidden sm:inline">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-slate-900 border border-slate-700 text-slate-200 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500"
+              >
+                <option value="popular">Most Popular</option>
+                <option value="highest-rated">Highest Rated</option>
+                <option value="newest">Newest</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+            </div>
+
+            {/* Grid / List View Toggle */}
+            <div className="flex items-center bg-slate-900 border border-slate-700 rounded-xl p-0.5">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-1.5 rounded-lg text-xs transition ${
+                  viewMode === "grid" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                }`}
+                aria-label="Grid View"
+              >
+                <FaThLarge />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-1.5 rounded-lg text-xs transition ${
+                  viewMode === "list" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                }`}
+                aria-label="List View"
+              >
+                <FaList />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── 2-COLUMN LAYOUT (Udemy / Coursera Standard) ───────────── */}
+        <div className="grid lg:grid-cols-12 gap-8 pt-8 items-start">
+          {/* LEFT SIDEBAR: FILTERS */}
+          <aside className="hidden lg:block lg:col-span-3 space-y-6 sticky top-24">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <span className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
+                <FaFilter className="text-blue-400 text-xs" />
+                <span>Filters</span>
+              </span>
+              {(selectedCategory || selectedDifficulty || selectedRating || priceFilter !== "all" || searchQuery) && (
+                <button
+                  onClick={clearFilters}
+                  className="text-xs font-bold text-blue-400 hover:text-blue-300"
+                >
+                  Clear All
+                </button>
+              )}
+            </div>
+
+            {/* Category Filter */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Category</h4>
+              <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(selectedCategory === cat ? "" : cat)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-left transition ${
+                      selectedCategory === cat
+                        ? "bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold"
+                        : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    {selectedCategory === cat && <FaCheckCircle className="text-xs text-blue-400" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Ratings Filter */}
+            <div className="space-y-3 pt-4 border-t border-slate-800">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Ratings</h4>
+              <div className="space-y-1.5">
+                {RATINGS_FILTER.map((rf) => (
+                  <button
+                    key={rf.label}
+                    onClick={() => setSelectedRating(selectedRating === rf.min ? null : rf.min)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${
+                      selectedRating === rf.min
+                        ? "bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold"
+                        : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 text-amber-400">
+                      <div className="flex text-xs">
+                        {[...Array(5)].map((_, i) => (
+                          <FaStar key={i} />
+                        ))}
+                      </div>
+                      <span className="text-slate-300">{rf.label}</span>
+                    </div>
+                    {selectedRating === rf.min && <FaCheckCircle className="text-xs text-blue-400" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Level Filter */}
+            <div className="space-y-3 pt-4 border-t border-slate-800">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Level</h4>
+              <div className="space-y-1.5">
+                {LEVELS.map((lvl) => (
+                  <button
+                    key={lvl}
+                    onClick={() => setSelectedDifficulty(selectedDifficulty === lvl ? "" : lvl)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${
+                      selectedDifficulty === lvl
+                        ? "bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold"
+                        : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                    }`}
+                  >
+                    <span>{lvl}</span>
+                    {selectedDifficulty === lvl && <FaCheckCircle className="text-xs text-blue-400" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Price Filter */}
+            <div className="space-y-3 pt-4 border-t border-slate-800">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Price</h4>
+              <div className="grid grid-cols-3 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                {["all", "free", "paid"].map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPriceFilter(p)}
+                    className={`py-1.5 text-xs font-bold uppercase rounded-lg transition ${
+                      priceFilter === p
+                        ? "bg-blue-600 text-white shadow-sm"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          {/* RIGHT MAIN CATALOG */}
+          <main className="lg:col-span-9 space-y-8">
+            {isLoading ? (
+              <div className="py-20 text-center space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto" />
+                <p className="text-slate-400 text-sm">Loading course library...</p>
+              </div>
+            ) : isError ? (
+              <AlertMessage
+                type="error"
+                message={error?.response?.data?.message || "Failed to load courses"}
+              />
+            ) : filteredCourses.length === 0 ? (
+              <div className="bg-[#0f1524] border border-slate-800 rounded-3xl p-12 text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto text-2xl">
+                  <FaSearch />
+                </div>
+                <h3 className="text-xl font-bold text-white">No matching courses found</h3>
+                <p className="text-slate-400 text-sm max-w-md mx-auto">
+                  Try adjusting your search terms or clearing some filters to explore our full curriculum.
+                </p>
+                <button
+                  onClick={clearFilters}
+                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            ) : (
+              <div
+                className={
+                  viewMode === "grid"
+                    ? "grid sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                    : "space-y-4"
+                }
+              >
+                {filteredCourses.map((course) => (
+                  <CourseCard
+                    key={course._id}
+                    course={course}
+                    isRecommended={recommendedList.some((r) => r._id === course._id)}
+                    onEnroll={handleEnrollment}
+                    currentUser={userProfile}
+                    viewMode={viewMode}
+                  />
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
+
+      {/* MOBILE FILTERS DRAWER */}
+      {mobileFilterOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setMobileFilterOpen(false)}
+          />
+          <div className="relative ml-auto w-full max-w-xs bg-[#0f1524] h-full p-6 shadow-2xl overflow-y-auto space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <span className="text-base font-bold text-white">Filter Courses</span>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="p-1 rounded text-slate-400 hover:text-white"
+              >
+                <FaTimes size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold uppercase text-slate-400">Category</h4>
+              <div className="space-y-1">
+                {CATEGORIES.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => {
+                      setSelectedCategory(selectedCategory === c ? "" : c);
+                      setMobileFilterOpen(false);
+                    }}
+                    className="w-full text-left p-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800"
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-4 border-t border-slate-800">
+              <h4 className="text-xs font-bold uppercase text-slate-400">Level</h4>
+              <div className="space-y-1">
+                {LEVELS.map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => {
+                      setSelectedDifficulty(selectedDifficulty === l ? "" : l);
+                      setMobileFilterOpen(false);
+                    }}
+                    className="w-full text-left p-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800"
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-800">
+              <button
+                onClick={() => {
+                  clearFilters();
+                  setMobileFilterOpen(false);
+                }}
+                className="w-full py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+              >
+                Reset Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default Courses;
+}

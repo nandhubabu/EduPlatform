@@ -8,6 +8,7 @@ import Register from "./components/User/Register";
 import Login from "./components/User/Login";
 import Homepage from "./components/Home/HomePage";
 import Courses from "./components/Courses/Courses";
+import CourseDetails from "./components/Courses/CourseDetails";
 import CoursePlayer from "./components/Courses/CoursePlayer";
 import Settings from "./components/User/SettingsPage";
 import FloatingChatbot from "./components/Chatbot/FloatingChatbot";
@@ -63,9 +64,20 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/courses" element={<Courses />} />
         
-        {/* Course Player - protected */}
+        {/* Course Details - Public Landing Page */}
+        <Route path="/courses/:courseId" element={<CourseDetails />} />
+
+        {/* Course Classroom Player - Protected */}
         <Route
-          path="/courses/:courseId"
+          path="/courses/:courseId/learn"
+          element={
+            <AuthRoute>
+              <CoursePlayer />
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/courses/:courseId/player"
           element={
             <AuthRoute>
               <CoursePlayer />

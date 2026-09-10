@@ -1,9 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./utils/connectDB");
 const { errorHandler } = require("./middlewares/errorMiddleware");
 const usersRouter = require("./routes/usersRouter");
-require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const coursesRouter = require("./routes/coursesRouter");
 const courseSectionsRouter = require("./routes/courseSectionsRouter");
