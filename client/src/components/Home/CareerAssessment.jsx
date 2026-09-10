@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   FaGraduationCap, 
   FaLaptopCode, 
@@ -807,6 +808,8 @@ const careerRecommendations = {
 };
 
 const CareerAssessment = ({ onClose }) => {
+  const navigate = useNavigate();
+  const handleClose = onClose || (() => navigate('/'));
   const [currentStep, setCurrentStep] = useState('education');
   const [educationLevel, setEducationLevel] = useState('');
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -1819,7 +1822,7 @@ const CareerAssessment = ({ onClose }) => {
 
             <div className="flex justify-between">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
               >
                 Cancel
@@ -2057,7 +2060,7 @@ const CareerAssessment = ({ onClose }) => {
           {/* Footer */}
           <div className="flex justify-between">
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
             >
               Exit Assessment

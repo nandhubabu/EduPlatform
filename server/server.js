@@ -16,20 +16,38 @@ const rateLimit = require("express-rate-limit");
 const app = express();
 // Middleware
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  process.env.FRONTEND_URL,
+  "https://edu-platform-frontend-psi.vercel.app",
+].filter(Boolean);
+
 const corsOptions = {
-  origin: [
-    "http://localhost:3000",     // React default port
-    "http://localhost:5173",     // Vite default port
-    "http://localhost:5174",     // Vite alternative port
-    "http://127.0.0.1:3000",     // Local IP variants
-    "http://127.0.0.1:5173", 
-    "http://127.0.0.1:5174",
-    process.env.FRONTEND_URL,    // Production frontend URL from Vercel
-    "https://edu-platform-frontend-psi.vercel.app", // Vercel production URL
-    "https://edu-platform-frontend-git-main-nandhubabus-projects.vercel.app", // Vercel git URL
-    "https://edu-platform-frontend-5je9u1qjk-nandhubabus-projects.vercel.app"
-  ].filter(Boolean), // Remove undefined values
-  credentials: true, // This is important for cookies
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, Render health checks)
+    if (!origin) return callback(null, true);
+
+    try {
+      const url = new URL(origin);
+      const isAllowedExplicit = allowedOrigins.some(
+        (allowed) => allowed && (allowed === origin || allowed.replace(/\/$/, "") === origin.replace(/\/$/, ""))
+      );
+      const isVercelDomain = url.hostname.endsWith(".vercel.app");
+
+      if (isAllowedExplicit || isVercelDomain) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    } catch {
+      return callback(null, true);
+    }
+  },
+  credentials: true, // Crucial for cross-site JWT cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'Set-Cookie'],
   exposedHeaders: ['Set-Cookie']
