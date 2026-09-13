@@ -2,8 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 class GeminiService {
   constructor() {
-    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+    this.genAI = null;
     
     // Career and education context for better responses
     this.systemContext = `
@@ -53,8 +52,22 @@ Respond naturally and conversationally while maintaining professionalism.
 `;
   }
 
+  getModel() {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return null;
+    if (!this.genAI) {
+      this.genAI = new GoogleGenerativeAI(apiKey);
+    }
+    return this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  }
+
   async generateResponse(userMessage, conversationHistory = []) {
     try {
+      const model = this.getModel();
+      if (!model) {
+        return this.getFallbackResponse(userMessage);
+      }
+
       // Build conversation context
       let prompt = this.systemContext + "\n\nConversation History:\n";
       
@@ -66,7 +79,15 @@ Respond naturally and conversationally while maintaining professionalism.
       
       prompt += `\nUser: ${userMessage}\n\nAssistant:`;
 
-      const result = await this.model.generateContent(prompt);
+      let result;
+      try {
+        result = await model.generateContent(prompt);
+      } catch (e) {
+        // Fallback to gemini-pro if 1.5-flash isn't available
+        const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+        result = await fallbackModel.generateContent(prompt);
+      }
+
       const response = await result.response;
       const text = response.text();
 
