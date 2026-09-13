@@ -49,10 +49,10 @@ const UpdateProfilePicture = () => {
   };
   console.log(mutation);
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 m-4">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
-          <AiFillCamera className="inline-block mr-2" /> Update Profile Picture
+    <div className="flex items-center justify-center min-h-screen bg-[#f8fafc]">
+      <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200 shadow-xl p-8 m-4">
+        <h2 className="text-2xl font-extrabold text-center text-slate-900 mb-8 tracking-tight">
+          <AiFillCamera className="inline-block mr-2 text-indigo-600" /> Update Profile Picture
         </h2>
 
         <form onSubmit={formik.handleSubmit} className="space-y-6">
@@ -60,7 +60,7 @@ const UpdateProfilePicture = () => {
           <div className="flex flex-col items-center">
             <label
               htmlFor="images"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2"
             >
               Upload Image
             </label>
@@ -70,20 +70,20 @@ const UpdateProfilePicture = () => {
               name="profilePicture"
               accept="image/*"
               onChange={handleFileChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              className="mt-1 block w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 text-sm"
             />
-            {imageError && <p className="text-sm text-red-600">{imageError}</p>}
+            {imageError && <p className="text-xs text-rose-600 mt-1 font-medium">{imageError}</p>}
             {imagePreview && (
-              <div className="mt-2 relative">
+              <div className="mt-4 relative">
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="h-32 w-32 object-cover rounded-full"
+                  className="h-32 w-32 object-cover rounded-full border-2 border-indigo-500 shadow"
                 />
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="absolute right-0 bottom-0 bg-red-600 text-white rounded-full p-1"
+                  className="absolute right-0 bottom-0 bg-rose-600 hover:bg-rose-700 text-white rounded-full p-2 shadow"
                 >
                   <AiFillDelete />
                 </button>
@@ -94,7 +94,7 @@ const UpdateProfilePicture = () => {
           {/* Submit Button - Button to submit the form */}
           <button
             type="submit"
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="w-full py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-600/20 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none transition duration-150"
           >
             Upload Profile Picture
           </button>

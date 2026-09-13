@@ -180,52 +180,53 @@ const FloatingChatbot = () => {
         <div className="fixed bottom-6 right-6 z-50">
           <button
             onClick={() => setIsOpen(true)}
-            className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transform hover:scale-110 transition-all duration-300 animate-pulse border border-white/10"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 border border-indigo-500/20"
+            aria-label="Open Career Assistant"
           >
             <FaComments className="text-2xl" />
           </button>
           {/* Tooltip */}
-          <div className="absolute bottom-16 right-0 bg-slate-800 border border-slate-700 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl">
+          <div className="absolute bottom-16 right-0 bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-lg">
             Need help? Chat with our assistant!
-            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-slate-800"></div>
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-slate-900"></div>
           </div>
         </div>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-[#0a0d14]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 z-50 flex flex-col overflow-hidden">
+        <div className="fixed bottom-6 right-6 w-96 h-[520px] bg-white rounded-3xl shadow-2xl border border-slate-200/90 z-50 flex flex-col overflow-hidden animate-fadeIn">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-900/80 to-cyan-900/80 backdrop-blur-md text-white p-4 flex items-center justify-between border-b border-white/5">
+          <div className="bg-slate-50/90 backdrop-blur-md px-5 py-4 flex items-center justify-between border-b border-slate-200">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center">
-                <FaRobot className="text-purple-400 text-xl" />
+              <div className="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center">
+                <FaRobot className="text-indigo-600 text-xl" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-100 text-sm">Career Assistant</h3>
-                <p className="text-xs text-slate-400">Here to help you succeed!</p>
+                <h3 className="font-bold text-slate-900 text-sm tracking-tight">Career Assistant</h3>
+                <p className="text-xs text-slate-500 font-medium">Always online to help you succeed</p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-slate-400 hover:text-white hover:bg-white/5 p-2 rounded-full transition-colors"
+              className="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 p-2 rounded-full transition-colors"
             >
               <FaTimes />
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#080a0f] border-b border-white/5">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 border-b border-slate-100">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}>
-                <div className={`max-w-[80%] ${message.isBot ? 'order-2' : 'order-1'}`}>
+                <div className={`max-w-[82%] ${message.isBot ? 'order-2' : 'order-1'}`}>
                   <div className={`flex items-start space-x-2 ${message.isBot ? '' : 'flex-row-reverse space-x-reverse'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${message.isBot ? 'bg-purple-500/10 text-purple-400' : 'bg-cyan-500/10 text-cyan-400'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${message.isBot ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-slate-200 text-slate-700'}`}>
                       {message.isBot ? <FaRobot className="text-xs" /> : <FaUser className="text-xs" />}
                     </div>
-                    <div className={`rounded-2xl px-4 py-2 ${message.isBot ? 'bg-white/5 border border-white/5 text-slate-200' : 'bg-gradient-to-r from-purple-600/90 to-cyan-500/90 text-white border border-white/10'}`}>
+                    <div className={`rounded-2xl px-4 py-2.5 ${message.isBot ? 'bg-white border border-slate-200 text-slate-800 shadow-sm' : 'bg-indigo-600 text-white shadow-sm'}`}>
                       <p className="text-sm whitespace-pre-line leading-relaxed">{message.text}</p>
-                      <p className={`text-[10px] mt-1 text-right ${message.isBot ? 'text-slate-400' : 'text-cyan-200'}`}>
+                      <p className={`text-[10px] mt-1 text-right font-medium ${message.isBot ? 'text-slate-400' : 'text-indigo-200'}`}>
                         {formatTime(message.timestamp)}
                       </p>
                     </div>
@@ -238,7 +239,7 @@ const FloatingChatbot = () => {
                         <button
                           key={index}
                           onClick={() => handleQuickReply(reply.text, reply.action)}
-                          className="block w-full text-left bg-white/5 hover:bg-white/10 text-slate-200 px-3 py-2 rounded-lg text-xs border border-white/5 hover:border-purple-500/20 transition-all duration-200"
+                          className="block w-full text-left bg-white hover:bg-indigo-50/70 text-slate-700 hover:text-indigo-600 px-3.5 py-2.5 rounded-xl text-xs font-semibold border border-slate-200 hover:border-indigo-300 shadow-sm transition-all duration-150"
                         >
                           {reply.text}
                         </button>
@@ -253,10 +254,10 @@ const FloatingChatbot = () => {
             {isTyping && (
               <div className="flex justify-start">
                 <div className="flex items-start space-x-2">
-                  <div className="w-8 h-8 bg-purple-500/10 rounded-full flex items-center justify-center text-purple-400 shrink-0">
+                  <div className="w-8 h-8 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0">
                     <FaRobot className="text-xs" />
                   </div>
-                  <div className="bg-white/5 border border-white/5 rounded-2xl px-4 py-2">
+                  <div className="bg-white border border-slate-200 shadow-sm rounded-2xl px-4 py-2.5">
                     <div className="flex space-x-1 py-1">
                       <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
                       <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -270,7 +271,7 @@ const FloatingChatbot = () => {
           </div>
 
           {/* Input */}
-          <div className="p-4 bg-[#0a0d14]">
+          <div className="p-3.5 bg-white">
             <div className="flex space-x-2">
               <input
                 ref={inputRef}
@@ -279,14 +280,14 @@ const FloatingChatbot = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 focus:outline-none focus:border-purple-500 focus:bg-white/10 text-sm text-slate-200 placeholder-slate-500"
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-4 py-2.5 focus:outline-none focus:border-indigo-600 focus:bg-white text-sm text-slate-900 placeholder-slate-400 transition"
               />
               <button
                 onClick={() => handleSendMessage()}
                 disabled={!inputValue.trim()}
-                className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white p-2 rounded-full hover:shadow-lg transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed shrink-0 border border-white/10"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-full shadow hover:shadow-md transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               >
-                <FaPaperPlane className="text-sm" />
+                <FaPaperPlane className="text-xs" />
               </button>
             </div>
           </div>

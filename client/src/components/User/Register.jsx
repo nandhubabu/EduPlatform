@@ -85,72 +85,70 @@ const Register = () => {
   }, [isAuthenticated]);
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] text-[#e2e8f0] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Orbs */}
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Subtle Background Highlights */}
       <div 
-        className="absolute top-[10%] left-[15%] w-[400px] h-[400px] rounded-full bg-purple-600/10 blur-[100px] pointer-events-none" 
-        style={{ animation: "float 8s ease-in-out infinite" }}
+        className="absolute top-[10%] left-[15%] w-[400px] h-[400px] rounded-full bg-indigo-500/5 blur-[100px] pointer-events-none" 
       />
       <div 
-        className="absolute bottom-[10%] right-[15%] w-[350px] h-[350px] rounded-full bg-cyan-500/8 blur-[100px] pointer-events-none" 
-        style={{ animation: "float 10s ease-in-out infinite reverse" }}
+        className="absolute bottom-[10%] right-[15%] w-[350px] h-[350px] rounded-full bg-sky-500/5 blur-[100px] pointer-events-none" 
       />
 
       <div className="max-w-md w-full space-y-8 relative z-10">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(124,58,237,0.4)]">
+          <div className="mx-auto h-16 w-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-md">
             <FaUserGraduate className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+          <h2 className="text-3xl font-extrabold text-slate-900 mb-2">
             Create Your Account
           </h2>
-          <p className="text-slate-400">Join thousands of learners and educators worldwide</p>
+          <p className="text-slate-600">Join thousands of learners and educators worldwide</p>
         </div>
 
         {/* Form Container */}
-        <div className="bg-white/3 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/5">
+        <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-200">
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             {/* Alerts */}
             {mutation.isPending && (
-              <div className="bg-purple-950/30 border border-purple-500/20 rounded-xl p-4 flex items-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-500 mr-3"></div>
-                <span className="text-purple-200">Creating your account...</span>
+              <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600 mr-3"></div>
+                <span className="text-indigo-800 text-sm font-semibold">Creating your account...</span>
               </div>
             )}
             
             {mutation.isError && (
-              <div className="bg-red-950/30 border border-red-500/20 rounded-xl p-4 flex items-center">
-                <div className="h-5 w-5 text-red-400 mr-3">⚠️</div>
-                <span className="text-red-200">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center">
+                <div className="h-5 w-5 text-red-500 mr-3">⚠️</div>
+                <span className="text-red-700 text-sm font-medium">
                   {mutation.error.response?.data?.message || mutation.error.message}
                 </span>
               </div>
             )}
             
             {mutation.isSuccess && (
-              <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-4 flex items-center">
-                <div className="h-5 w-5 text-emerald-400 mr-3">✅</div>
-                <span className="text-emerald-200">Account created successfully!</span>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center">
+                <div className="h-5 w-5 text-emerald-600 mr-3">✅</div>
+                <span className="text-emerald-800 text-sm font-semibold">Account created successfully!</span>
               </div>
             )}
 
             {/* Username Field */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-300">Username</label>
+              <label className="text-sm font-semibold text-slate-700">Username</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <AiOutlineUser className="h-5 w-5 text-slate-500" />
+                  <AiOutlineUser className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
                   type="text"
                   placeholder="Enter your username"
-                  className="w-full pl-12 pr-4 py-3 bg-[#090b11] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition duration-200"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-1 focus:ring-indigo-600 transition duration-200"
                   {...formik.getFieldProps("username")}
                 />
               </div>
               {formik.touched.username && formik.errors.username && (
-                <p className="text-red-400 text-sm flex items-center mt-1">
+                <p className="text-red-600 text-sm flex items-center mt-1">
                   <span className="mr-1">⚠️</span>
                   {formik.errors.username}
                 </p>
@@ -159,20 +157,20 @@ const Register = () => {
 
             {/* Email Field */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-300">Email Address</label>
+              <label className="text-sm font-semibold text-slate-700">Email Address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <AiOutlineMail className="h-5 w-5 text-slate-500" />
+                  <AiOutlineMail className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full pl-12 pr-4 py-3 bg-[#090b11] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition duration-200"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-1 focus:ring-indigo-600 transition duration-200"
                   {...formik.getFieldProps("email")}
                 />
               </div>
               {formik.touched.email && formik.errors.email && (
-                <p className="text-red-400 text-sm flex items-center mt-1">
+                <p className="text-red-600 text-sm flex items-center mt-1">
                   <span className="mr-1">⚠️</span>
                   {formik.errors.email}
                 </p>
@@ -181,20 +179,20 @@ const Register = () => {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-300">Password</label>
+              <label className="text-sm font-semibold text-slate-700">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <RiLockPasswordLine className="h-5 w-5 text-slate-500" />
+                  <RiLockPasswordLine className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
                   type="password"
                   placeholder="Create a secure password"
-                  className="w-full pl-12 pr-4 py-3 bg-[#090b11] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition duration-200"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-1 focus:ring-indigo-600 transition duration-200"
                   {...formik.getFieldProps("password")}
                 />
               </div>
               {formik.touched.password && formik.errors.password && (
-                <p className="text-red-400 text-sm flex items-center mt-1">
+                <p className="text-red-600 text-sm flex items-center mt-1">
                   <span className="mr-1">⚠️</span>
                   {formik.errors.password}
                 </p>
@@ -203,53 +201,51 @@ const Register = () => {
 
             {/* Role Selection */}
             <div className="space-y-3">
-              <label className="text-sm font-semibold text-slate-300">Choose Your Path</label>
+              <label className="text-sm font-semibold text-slate-700">Choose Your Path</label>
               <p className="text-xs text-slate-500 mb-3">
-                Currently selected: <span className="font-semibold text-purple-400">{formik.values.role}</span>
+                Currently selected: <span className="font-semibold text-indigo-600 capitalize">{formik.values.role}</span>
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div
-                  className={`cursor-pointer rounded-xl p-4 text-center transition-all duration-300 border ${
+                  className={`cursor-pointer rounded-2xl p-4 text-center transition-all duration-200 border ${
                     formik.values.role === "student"
-                      ? "border-purple-500 bg-purple-500/10 text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.2)] transform scale-105"
-                      : "border-white/10 bg-[#090b11] text-slate-400 hover:border-purple-500/20"
+                      ? "border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm"
+                      : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300"
                   }`}
                   onClick={() => {
-                    console.log("Student role selected");
                     formik.setFieldValue("role", "student");
                   }}
                 >
-                  <div className={`w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    formik.values.role === "student" ? "bg-purple-500/20 text-purple-300" : "bg-white/5 text-slate-400"
+                  <div className={`w-10 h-10 mx-auto mb-2 rounded-xl flex items-center justify-center ${
+                    formik.values.role === "student" ? "bg-indigo-600 text-white shadow-sm" : "bg-white border border-slate-200 text-slate-500"
                   }`}>
                     <FaUserGraduate className="text-lg" />
                   </div>
                   <h3 className="font-bold text-sm">Student</h3>
-                  <p className="text-xs mt-1 text-slate-400 leading-tight">Learn from expert instructors</p>
+                  <p className="text-xs mt-1 text-slate-500 leading-tight">Learn from expert instructors</p>
                 </div>
                 
                 <div
-                  className={`cursor-pointer rounded-xl p-4 text-center transition-all duration-300 border ${
+                  className={`cursor-pointer rounded-2xl p-4 text-center transition-all duration-200 border ${
                     formik.values.role === "instructor"
-                      ? "border-cyan-500 bg-cyan-500/10 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)] transform scale-105"
-                      : "border-white/10 bg-[#090b11] text-slate-400 hover:border-cyan-500/20"
+                      ? "border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm"
+                      : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300"
                   }`}
                   onClick={() => {
-                    console.log("Instructor role selected");
                     formik.setFieldValue("role", "instructor");
                   }}
                 >
-                  <div className={`w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    formik.values.role === "instructor" ? "bg-cyan-500/20 text-cyan-300" : "bg-white/5 text-slate-400"
+                  <div className={`w-10 h-10 mx-auto mb-2 rounded-xl flex items-center justify-center ${
+                    formik.values.role === "instructor" ? "bg-indigo-600 text-white shadow-sm" : "bg-white border border-slate-200 text-slate-500"
                   }`}>
                     <FaChalkboardTeacher className="text-lg" />
                   </div>
                   <h3 className="font-bold text-sm">Instructor</h3>
-                  <p className="text-xs mt-1 text-slate-400 leading-tight">Share your knowledge with others</p>
+                  <p className="text-xs mt-1 text-slate-500 leading-tight">Share your knowledge with others</p>
                 </div>
               </div>
               {formik.touched.role && formik.errors.role && (
-                <p className="text-red-400 text-sm flex items-center mt-1">
+                <p className="text-red-600 text-sm flex items-center mt-1">
                   <span className="mr-1">⚠️</span>
                   {formik.errors.role}
                 </p>
@@ -260,17 +256,17 @@ const Register = () => {
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="w-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold py-3 px-4 rounded-xl hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-[#0a0d14] transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)]"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
             >
               {mutation.isPending ? "Creating Account..." : "Create Account"}
             </button>
 
             {/* Login Link */}
-            <div className="text-center pt-4 border-t border-white/5">
-              <span className="text-slate-400">Already have an account? </span>
+            <div className="text-center pt-4 border-t border-slate-100">
+              <span className="text-slate-600">Already have an account? </span>
               <Link
                 to="/login"
-                className="font-semibold text-purple-400 hover:text-purple-300 transition duration-200"
+                className="font-semibold text-indigo-600 hover:text-indigo-700 transition duration-200"
               >
                 Sign in here
               </Link>

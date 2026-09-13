@@ -94,21 +94,21 @@ const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, view
     return (
       <Link
         to={`/courses/${course._id}`}
-        className="group bg-[#0f1524] border border-slate-800 hover:border-blue-500/50 rounded-2xl p-4 transition-all duration-200 flex flex-col sm:flex-row gap-5 no-underline shadow-md hover:shadow-xl hover:shadow-blue-500/5"
+        className="group bg-white border border-slate-200 hover:border-indigo-300 rounded-2xl p-4 transition-all duration-200 flex flex-col sm:flex-row gap-5 no-underline shadow-sm hover:shadow-lg hover:shadow-indigo-500/5"
       >
-        <div className="relative aspect-video sm:w-60 flex-shrink-0 rounded-xl overflow-hidden bg-slate-800">
+        <div className="relative aspect-video sm:w-60 flex-shrink-0 rounded-xl overflow-hidden bg-slate-100">
           <img
             src={thumbnail}
             alt={course.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 flex items-center justify-center transition-colors">
-            <div className="w-10 h-10 rounded-full bg-blue-600/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-transparent flex items-center justify-center transition-colors">
+            <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
               <FaPlay className="text-xs ml-0.5" />
             </div>
           </div>
           {isRecommended && (
-            <div className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 px-2 py-0.5 rounded text-[10px] font-black uppercase">
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded text-[10px] font-black uppercase shadow-sm">
               AI Pick
             </div>
           )}
@@ -117,44 +117,44 @@ const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, view
         <div className="flex-1 flex flex-col justify-between space-y-2">
           <div>
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-semibold text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
+              <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200">
                 {course.category || "General"}
               </span>
-              <span className="text-xs text-slate-400 font-medium">
+              <span className="text-xs text-slate-500 font-medium">
                 {course.difficulty || "All Levels"}
               </span>
             </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors mt-1.5 line-clamp-1">
+            <h3 className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mt-1.5 line-clamp-1">
               {course.title}
             </h3>
-            <p className="text-xs text-slate-400 line-clamp-2 mt-1">
+            <p className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">
               {course.description || "Master core concepts with hands-on practice, code walkthroughs, and real-world projects."}
             </p>
-            <p className="text-xs text-slate-300 font-medium mt-1">
-              Instructor: <span className="text-slate-200">{instructorName}</span>
+            <p className="text-xs text-slate-600 font-medium mt-1.5">
+              Instructor: <span className="text-slate-900 font-semibold">{instructorName}</span>
             </p>
           </div>
 
-          <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 text-amber-400 text-xs font-black">
+              <div className="flex items-center gap-1 text-amber-500 text-xs font-black">
                 <span>{rating.toFixed(1)}</span>
-                <div className="flex">
+                <div className="flex text-amber-400">
                   {[...Array(5)].map((_, i) => (
                     <FaStar key={i} />
                   ))}
                 </div>
-                <span className="text-slate-400 font-normal">({reviewsCount})</span>
+                <span className="text-slate-500 font-normal">({reviewsCount})</span>
               </div>
-              <span className="text-slate-500">&bull;</span>
-              <span className="text-xs text-slate-400 flex items-center gap-1">
-                <FaClock className="text-slate-500" />
+              <span className="text-slate-300">&bull;</span>
+              <span className="text-xs text-slate-500 flex items-center gap-1">
+                <FaClock className="text-slate-400" />
                 {hours} hrs &bull; {lectures} lectures
               </span>
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-lg font-black text-white">
+              <span className="text-lg font-black text-slate-900">
                 {course.price ? `$${course.price}` : "Free"}
               </span>
               <button
@@ -162,10 +162,10 @@ const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, view
                 disabled={isEnrolling || isEnrolled}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                   isEnrolled
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-300"
                     : isInstructor
-                    ? "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30"
-                    : "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30"
+                    ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                    : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                 }`}
               >
                 {isEnrolled ? (
@@ -190,50 +190,50 @@ const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, view
   return (
     <Link
       to={`/courses/${course._id}`}
-      className="group bg-[#0f1524] border border-slate-800 hover:border-blue-500/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col no-underline"
+      className="group bg-white border border-slate-200 hover:border-indigo-300 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col no-underline"
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
+      <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
         <img
           src={thumbnail}
           alt={course.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full bg-blue-600/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+        <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-transparent transition-colors flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
             <FaPlay className="text-xs ml-0.5" />
           </div>
         </div>
 
         {isRecommended ? (
-          <div className="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 px-2 py-0.5 rounded text-[10px] font-black uppercase shadow-md flex items-center gap-1">
+          <div className="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-0.5 rounded text-[10px] font-black uppercase shadow-sm flex items-center gap-1">
             <FaBrain />
             <span>AI Pick</span>
           </div>
         ) : (
-          <div className="absolute top-2.5 left-2.5 bg-amber-400 text-slate-950 px-2 py-0.5 rounded text-[10px] font-black uppercase shadow-md">
-            Bestseller
+          <div className="absolute top-2.5 left-2.5 bg-indigo-600 text-white px-2.5 py-0.5 rounded text-[10px] font-bold uppercase shadow-sm">
+            Featured
           </div>
         )}
 
-        <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[10px] font-semibold">
+        <div className="absolute bottom-2 right-2 bg-slate-900/80 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[10px] font-semibold">
           {course.difficulty || "All Levels"}
         </div>
       </div>
 
       <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
         <div className="space-y-1.5">
-          <div className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">
+          <div className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">
             {course.category || "General"}
           </div>
-          <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+          <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-2 leading-snug">
             {course.title}
           </h3>
-          <p className="text-xs text-slate-400 truncate">
+          <p className="text-xs text-slate-500 truncate">
             {instructorName}
           </p>
 
           <div className="flex items-center gap-1.5 pt-0.5">
-            <span className="text-sm font-black text-amber-400">
+            <span className="text-sm font-black text-amber-500">
               {rating.toFixed(1)}
             </span>
             <div className="flex text-amber-400 text-xs">
@@ -241,14 +241,14 @@ const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, view
                 <FaStar key={i} />
               ))}
             </div>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-500">
               ({reviewsCount})
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-1">
+          <div className="flex items-center gap-2 text-[11px] text-slate-500 pt-1">
             <span className="flex items-center gap-1">
-              <FaClock className="text-slate-500" />
+              <FaClock className="text-slate-400" />
               {hours} hrs
             </span>
             <span>&bull;</span>
@@ -256,13 +256,13 @@ const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, view
           </div>
         </div>
 
-        <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+        <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-lg font-black text-white">
+            <span className="text-lg font-black text-slate-900">
               {course.price ? `$${course.price}` : "Free"}
             </span>
             {course.price > 0 && (
-              <span className="text-xs text-slate-500 line-through">
+              <span className="text-xs text-slate-400 line-through">
                 ${(course.price * 3).toFixed(2)}
               </span>
             )}
@@ -271,12 +271,12 @@ const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, view
           <button
             onClick={handleEnroll}
             disabled={isEnrolling || isEnrolled}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
               isEnrolled
-                ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-300"
                 : isInstructor
-                ? "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30"
-                : "bg-blue-600 hover:bg-blue-500 text-white"
+                ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
             }`}
           >
             {isEnrolled ? (
@@ -429,37 +429,37 @@ export default function Courses() {
   const recommendedList = recommendationsData?.recommendedCourses || [];
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans antialiased pb-20">
-      {/* ─── HEADER BANNER (Udemy / Coursera Catalog Header) ─────────── */}
-      <div className="bg-gradient-to-b from-slate-900 to-[#0b0f19] border-b border-slate-800 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-20">
+      {/* ─── HEADER BANNER (Clean Modern Light Catalog Billboard) ─────────── */}
+      <div className="bg-white border-b border-slate-200 py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-blue-400">
+              <div className="text-xs font-bold uppercase tracking-wider text-indigo-600">
                 {selectedCategory ? `${selectedCategory} Courses` : "Explore All Courses"}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-1">
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-1">
                 {selectedCategory || "Skill-Building Online Courses"}
               </h1>
-              <p className="text-slate-400 text-sm mt-1 max-w-2xl">
-                Explore comprehensive curriculum with industry veterans. Gain practical experience and shareable certifications.
+              <p className="text-slate-600 text-sm mt-1 max-w-2xl">
+                Explore comprehensive curriculum taught by industry veterans. Gain hands-on project experience and verifiable certificates.
               </p>
             </div>
 
             {/* AI Recommendation Banner Pill */}
             <Link
               to="/assessment"
-              className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-purple-500/30 text-purple-300 text-xs font-bold hover:border-purple-500/60 transition shadow-lg self-start md:self-auto"
+              className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold hover:bg-indigo-100 hover:border-indigo-300 transition shadow-sm self-start md:self-auto"
             >
-              <FaBrain className="text-sm text-purple-400" />
+              <FaBrain className="text-sm text-indigo-600" />
               <span>Take AI Career Assessment to get personalized picks &rarr;</span>
             </Link>
           </div>
 
           {/* Toast Alert Message */}
           {enrollmentMessage && (
-            <div className="p-3 rounded-xl bg-blue-600/20 border border-blue-500 text-blue-200 text-sm font-semibold flex items-center gap-2 animate-fadeIn">
-              <FaCheckCircle />
+            <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-800 text-sm font-semibold flex items-center gap-2 animate-fadeIn">
+              <FaCheckCircle className="text-indigo-600" />
               <span>{enrollmentMessage}</span>
             </div>
           )}
@@ -468,17 +468,17 @@ export default function Courses() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {/* Top Controls Bar: Search summary, sort, view mode */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileFilterOpen(true)}
-              className="lg:hidden flex items-center gap-2 px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-slate-200"
+              className="lg:hidden flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-sm"
             >
               <FaSlidersH />
               <span>Filters</span>
             </button>
-            <span className="text-sm font-bold text-slate-300">
-              Showing <span className="text-white">{filteredCourses.length}</span> courses
+            <span className="text-sm font-bold text-slate-600">
+              Showing <span className="text-slate-900 font-extrabold">{filteredCourses.length}</span> courses
               {searchQuery && <span> for &ldquo;{searchQuery}&rdquo;</span>}
             </span>
           </div>
@@ -486,11 +486,11 @@ export default function Courses() {
           <div className="flex items-center gap-3 self-end sm:self-auto">
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-semibold hidden sm:inline">Sort by:</span>
+              <span className="text-xs text-slate-500 font-semibold hidden sm:inline">Sort by:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-slate-900 border border-slate-700 text-slate-200 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500"
+                className="bg-white border border-slate-200 text-slate-800 text-xs font-bold rounded-xl px-3 py-2 shadow-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               >
                 <option value="popular">Most Popular</option>
                 <option value="highest-rated">Highest Rated</option>
@@ -501,11 +501,11 @@ export default function Courses() {
             </div>
 
             {/* Grid / List View Toggle */}
-            <div className="flex items-center bg-slate-900 border border-slate-700 rounded-xl p-0.5">
+            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-0.5">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`p-1.5 rounded-lg text-xs transition ${
-                  viewMode === "grid" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                  viewMode === "grid" ? "bg-white text-indigo-600 shadow-sm font-bold" : "text-slate-500 hover:text-slate-900"
                 }`}
                 aria-label="Grid View"
               >
@@ -514,7 +514,7 @@ export default function Courses() {
               <button
                 onClick={() => setViewMode("list")}
                 className={`p-1.5 rounded-lg text-xs transition ${
-                  viewMode === "list" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                  viewMode === "list" ? "bg-white text-indigo-600 shadow-sm font-bold" : "text-slate-500 hover:text-slate-900"
                 }`}
                 aria-label="List View"
               >
@@ -528,15 +528,15 @@ export default function Courses() {
         <div className="grid lg:grid-cols-12 gap-8 pt-8 items-start">
           {/* LEFT SIDEBAR: FILTERS */}
           <aside className="hidden lg:block lg:col-span-3 space-y-6 sticky top-24">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <span className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
-                <FaFilter className="text-blue-400 text-xs" />
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <span className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <FaFilter className="text-indigo-600 text-xs" />
                 <span>Filters</span>
               </span>
               {(selectedCategory || selectedDifficulty || selectedRating || priceFilter !== "all" || searchQuery) && (
                 <button
                   onClick={clearFilters}
-                  className="text-xs font-bold text-blue-400 hover:text-blue-300"
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
                 >
                   Clear All
                 </button>
@@ -545,86 +545,86 @@ export default function Courses() {
 
             {/* Category Filter */}
             <div className="space-y-3">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Category</h4>
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Category</h4>
               <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(selectedCategory === cat ? "" : cat)}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-left transition ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-left transition ${
                       selectedCategory === cat
-                        ? "bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold"
-                        : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                        ? "bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                     }`}
                   >
                     <span>{cat}</span>
-                    {selectedCategory === cat && <FaCheckCircle className="text-xs text-blue-400" />}
+                    {selectedCategory === cat && <FaCheckCircle className="text-xs text-indigo-600" />}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Ratings Filter */}
-            <div className="space-y-3 pt-4 border-t border-slate-800">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Ratings</h4>
+            <div className="space-y-3 pt-4 border-t border-slate-200">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Ratings</h4>
               <div className="space-y-1.5">
                 {RATINGS_FILTER.map((rf) => (
                   <button
                     key={rf.label}
                     onClick={() => setSelectedRating(selectedRating === rf.min ? null : rf.min)}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition ${
                       selectedRating === rf.min
-                        ? "bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold"
-                        : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                        ? "bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 text-amber-400">
-                      <div className="flex text-xs">
+                    <div className="flex items-center gap-1.5 text-amber-500">
+                      <div className="flex text-xs text-amber-400">
                         {[...Array(5)].map((_, i) => (
                           <FaStar key={i} />
                         ))}
                       </div>
-                      <span className="text-slate-300">{rf.label}</span>
+                      <span className="text-slate-700 font-medium">{rf.label}</span>
                     </div>
-                    {selectedRating === rf.min && <FaCheckCircle className="text-xs text-blue-400" />}
+                    {selectedRating === rf.min && <FaCheckCircle className="text-xs text-indigo-600" />}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Level Filter */}
-            <div className="space-y-3 pt-4 border-t border-slate-800">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Level</h4>
+            <div className="space-y-3 pt-4 border-t border-slate-200">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Level</h4>
               <div className="space-y-1.5">
                 {LEVELS.map((lvl) => (
                   <button
                     key={lvl}
                     onClick={() => setSelectedDifficulty(selectedDifficulty === lvl ? "" : lvl)}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition ${
                       selectedDifficulty === lvl
-                        ? "bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold"
-                        : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                        ? "bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                     }`}
                   >
                     <span>{lvl}</span>
-                    {selectedDifficulty === lvl && <FaCheckCircle className="text-xs text-blue-400" />}
+                    {selectedDifficulty === lvl && <FaCheckCircle className="text-xs text-indigo-600" />}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Price Filter */}
-            <div className="space-y-3 pt-4 border-t border-slate-800">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Price</h4>
-              <div className="grid grid-cols-3 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+            <div className="space-y-3 pt-4 border-t border-slate-200">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Price</h4>
+              <div className="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
                 {["all", "free", "paid"].map((p) => (
                   <button
                     key={p}
                     onClick={() => setPriceFilter(p)}
                     className={`py-1.5 text-xs font-bold uppercase rounded-lg transition ${
                       priceFilter === p
-                        ? "bg-blue-600 text-white shadow-sm"
-                        : "text-slate-400 hover:text-white"
+                        ? "bg-white text-indigo-600 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
                     {p}
@@ -638,8 +638,8 @@ export default function Courses() {
           <main className="lg:col-span-9 space-y-8">
             {isLoading ? (
               <div className="py-20 text-center space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto" />
-                <p className="text-slate-400 text-sm">Loading course library...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mx-auto" />
+                <p className="text-slate-500 text-sm">Loading course library...</p>
               </div>
             ) : isError ? (
               <AlertMessage
@@ -647,17 +647,17 @@ export default function Courses() {
                 message={error?.response?.data?.message || "Failed to load courses"}
               />
             ) : filteredCourses.length === 0 ? (
-              <div className="bg-[#0f1524] border border-slate-800 rounded-3xl p-12 text-center space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto text-2xl">
+              <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center space-y-4 shadow-sm">
+                <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-2xl">
                   <FaSearch />
                 </div>
-                <h3 className="text-xl font-bold text-white">No matching courses found</h3>
-                <p className="text-slate-400 text-sm max-w-md mx-auto">
+                <h3 className="text-xl font-bold text-slate-900">No matching courses found</h3>
+                <p className="text-slate-600 text-sm max-w-md mx-auto">
                   Try adjusting your search terms or clearing some filters to explore our full curriculum.
                 </p>
                 <button
                   onClick={clearFilters}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition"
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition"
                 >
                   Clear All Filters
                 </button>
@@ -690,22 +690,22 @@ export default function Courses() {
       {mobileFilterOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
             onClick={() => setMobileFilterOpen(false)}
           />
-          <div className="relative ml-auto w-full max-w-xs bg-[#0f1524] h-full p-6 shadow-2xl overflow-y-auto space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <span className="text-base font-bold text-white">Filter Courses</span>
+          <div className="relative ml-auto w-full max-w-xs bg-white h-full p-6 shadow-2xl overflow-y-auto space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+              <span className="text-base font-bold text-slate-900">Filter Courses</span>
               <button
                 onClick={() => setMobileFilterOpen(false)}
-                className="p-1 rounded text-slate-400 hover:text-white"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               >
                 <FaTimes size={18} />
               </button>
             </div>
 
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase text-slate-400">Category</h4>
+              <h4 className="text-xs font-bold uppercase text-slate-700">Category</h4>
               <div className="space-y-1">
                 {CATEGORIES.map((c) => (
                   <button
@@ -714,7 +714,7 @@ export default function Courses() {
                       setSelectedCategory(selectedCategory === c ? "" : c);
                       setMobileFilterOpen(false);
                     }}
-                    className="w-full text-left p-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800"
+                    className="w-full text-left p-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100"
                   >
                     {c}
                   </button>
@@ -722,8 +722,8 @@ export default function Courses() {
               </div>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-slate-800">
-              <h4 className="text-xs font-bold uppercase text-slate-400">Level</h4>
+            <div className="space-y-3 pt-4 border-t border-slate-200">
+              <h4 className="text-xs font-bold uppercase text-slate-700">Level</h4>
               <div className="space-y-1">
                 {LEVELS.map((l) => (
                   <button
@@ -732,7 +732,7 @@ export default function Courses() {
                       setSelectedDifficulty(selectedDifficulty === l ? "" : l);
                       setMobileFilterOpen(false);
                     }}
-                    className="w-full text-left p-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800"
+                    className="w-full text-left p-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100"
                   >
                     {l}
                   </button>
@@ -740,13 +740,13 @@ export default function Courses() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800">
+            <div className="pt-4 border-t border-slate-200">
               <button
                 onClick={() => {
                   clearFilters();
                   setMobileFilterOpen(false);
                 }}
-                className="w-full py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+                className="w-full py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200"
               >
                 Reset Filters
               </button>

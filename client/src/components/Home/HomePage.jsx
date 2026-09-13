@@ -188,43 +188,42 @@ export default function HomePage() {
         level: c.difficulty || "All Levels",
         badge: idx === 0 ? "Bestseller" : idx === 1 ? "Highest Rated" : "Top Pick",
         badgeColor: idx === 0 ? "amber" : idx === 1 ? "purple" : "blue",
-        price: c.price || 0,
-        originalPrice: c.price ? (c.price * 3.5).toFixed(2) : 49.99,
-        category: c.category || "Technology",
-        thumbnail: CURATED_COURSES[idx % CURATED_COURSES.length].thumbnail,
+        thumbnail: c.thumbnail || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+        price: c.price || 19.99,
+        originalPrice: c.price ? (Number(c.price) * 3.5).toFixed(2) : "89.99",
       }))
     : CURATED_COURSES;
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans antialiased overflow-x-hidden">
-      {/* ─── 1. HERO SECTION (Coursera / Udemy High-Impact Billboard) ─── */}
-      <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased overflow-x-hidden">
+      {/* ─── 1. HERO SECTION (Clean Light Billboard) ─────────────────── */}
+      <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-[#f8fafc]">
         {/* Subtle background ambient glows */}
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[130px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             {/* Left Column: Heading & Value Prop */}
             <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold tracking-wide uppercase">
-                <FaBrain className="text-blue-400" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold tracking-wide uppercase shadow-sm">
+                <FaBrain className="text-indigo-600" />
                 <span>AI-Powered Personalized Learning Pathways</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15]">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
                 Learn Without Limits. <br className="hidden sm:block" />
-                Master <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">In-Demand Skills.</span>
+                Master <span className="text-indigo-600">In-Demand Skills.</span>
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
+              <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
                 Build job-ready expertise with top industry courses, hands-on portfolio projects, and Gemini AI career guidance trusted by learners worldwide.
               </p>
 
-              {/* Integrated Hero Search (Udemy Standard) */}
+              {/* Integrated Hero Search */}
               <form
                 onSubmit={handleHeroSearch}
-                className="max-w-xl mx-auto lg:mx-0 relative flex items-center bg-slate-900/90 border-2 border-slate-700/80 hover:border-blue-500/80 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/20 rounded-2xl p-1.5 shadow-2xl transition-all"
+                className="max-w-xl mx-auto lg:mx-0 relative flex items-center bg-white border-2 border-slate-200 hover:border-indigo-400 focus-within:border-indigo-600 focus-within:ring-4 focus-within:ring-indigo-500/10 rounded-2xl p-1.5 shadow-lg shadow-slate-200/50 transition-all"
               >
                 <div className="pl-4 pr-2 text-slate-400">
                   <FaSearch className="text-lg" />
@@ -234,19 +233,19 @@ export default function HomePage() {
                   value={heroSearch}
                   onChange={(e) => setHeroSearch(e.target.value)}
                   placeholder="What skill or career do you want to master?"
-                  className="w-full bg-transparent text-white placeholder-slate-400 text-sm sm:text-base focus:outline-none py-2 px-1"
+                  className="w-full bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base focus:outline-none py-2 px-1"
                 />
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-3 rounded-xl transition shadow-[0_0_15px_rgba(37,99,235,0.4)] whitespace-nowrap"
+                  className="btn-premium text-white font-bold text-sm px-6 py-3 rounded-xl transition shadow-md whitespace-nowrap"
                 >
                   Search
                 </button>
               </form>
 
               {/* Quick Topic Badges */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 pt-1 text-xs text-slate-400">
-                <span className="font-semibold text-slate-400">Popular:</span>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 pt-1 text-xs text-slate-500">
+                <span className="font-bold text-slate-700">Popular:</span>
                 {["Python", "React", "AI & ML", "AWS Cloud", "Career Assessment"].map((tag) => (
                   <button
                     key={tag}
@@ -254,7 +253,7 @@ export default function HomePage() {
                       if (tag === "Career Assessment") navigate("/assessment");
                       else navigate(`/courses?search=${encodeURIComponent(tag)}`);
                     }}
-                    className="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition"
+                    className="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-indigo-600 border border-slate-200 shadow-sm transition font-medium"
                   >
                     {tag}
                   </button>
@@ -262,20 +261,20 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Hero Visual Card (Udemy / Coursera Billboard) */}
+            {/* Right Column: Hero Visual Card */}
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto max-w-md lg:max-w-none">
                 {/* Main Card */}
-                <div className="bg-gradient-to-br from-slate-900/90 to-[#111624]/90 border border-slate-700/70 rounded-3xl p-6 shadow-2xl backdrop-blur-xl space-y-6">
-                  <div className="relative rounded-2xl overflow-hidden aspect-video border border-slate-700">
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-6">
+                  <div className="relative rounded-2xl overflow-hidden aspect-video border border-slate-100 shadow-inner">
                     <img
                       src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
                       alt="Students learning together"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-4">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
                       <div>
-                        <span className="bg-blue-500 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded">
+                        <span className="bg-indigo-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded shadow-sm">
                           Featured Specialization
                         </span>
                         <h4 className="text-white font-bold text-sm sm:text-base mt-1">
@@ -286,25 +285,25 @@ export default function HomePage() {
                   </div>
 
                   {/* Stat Highlights */}
-                  <div className="grid grid-cols-3 gap-3 text-center border-t border-slate-800 pt-4">
+                  <div className="grid grid-cols-3 gap-3 text-center border-t border-slate-100 pt-4">
                     <div>
-                      <div className="text-xl font-black text-white">4.9/5</div>
-                      <div className="text-[11px] text-slate-400">Rating (12k+)</div>
+                      <div className="text-xl font-black text-slate-900">4.9/5</div>
+                      <div className="text-[11px] text-slate-500 font-medium">Rating (12k+)</div>
                     </div>
-                    <div className="border-x border-slate-800">
-                      <div className="text-xl font-black text-emerald-400">96%</div>
-                      <div className="text-[11px] text-slate-400">Job Placement</div>
+                    <div className="border-x border-slate-100">
+                      <div className="text-xl font-black text-emerald-600">96%</div>
+                      <div className="text-[11px] text-slate-500 font-medium">Job Placement</div>
                     </div>
                     <div>
-                      <div className="text-xl font-black text-purple-400">200+</div>
-                      <div className="text-[11px] text-slate-400">Active Courses</div>
+                      <div className="text-xl font-black text-indigo-600">200+</div>
+                      <div className="text-[11px] text-slate-500 font-medium">Active Courses</div>
                     </div>
                   </div>
 
                   {/* Action Link */}
                   <Link
                     to="/courses"
-                    className="w-full py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:opacity-95 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition shadow-lg"
+                    className="w-full py-3.5 btn-premium text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition shadow-md"
                   >
                     <span>Explore All Courses</span>
                     <FaArrowRight className="text-xs" />
@@ -312,24 +311,24 @@ export default function HomePage() {
                 </div>
 
                 {/* Floating Badge 1 */}
-                <div className="absolute -top-4 -left-4 bg-[#141b2d] border border-blue-500/40 rounded-2xl p-3 shadow-xl flex items-center gap-3 animate-bounce-subtle hidden sm:flex">
-                  <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                <div className="absolute -top-4 -left-4 bg-white border border-slate-200 rounded-2xl p-3 shadow-lg flex items-center gap-3 hidden sm:flex">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
                     <FaAward className="text-lg" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-white">Certified Skills</div>
-                    <div className="text-[10px] text-slate-400">Sharable on LinkedIn</div>
+                    <div className="text-xs font-bold text-slate-900">Certified Skills</div>
+                    <div className="text-[10px] text-slate-500">Shareable on LinkedIn</div>
                   </div>
                 </div>
 
                 {/* Floating Badge 2 */}
-                <div className="absolute -bottom-5 -right-4 bg-[#141b2d] border border-emerald-500/40 rounded-2xl p-3 shadow-xl flex items-center gap-3 hidden sm:flex">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <div className="absolute -bottom-5 -right-4 bg-white border border-slate-200 rounded-2xl p-3 shadow-lg flex items-center gap-3 hidden sm:flex">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                     <FaUsers className="text-lg" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-white">45,000+</div>
-                    <div className="text-[10px] text-slate-400">Active Learners</div>
+                    <div className="text-xs font-bold text-slate-900">45,000+</div>
+                    <div className="text-[10px] text-slate-500">Active Learners</div>
                   </div>
                 </div>
               </div>
@@ -338,19 +337,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── 2. PARTNERS & TRUST STRIP (Coursera Standard) ──────────────── */}
-      <section className="border-y border-slate-800/80 bg-slate-900/40 py-8">
+      {/* ─── 2. PARTNERS & TRUST STRIP ─────────────────────────────────── */}
+      <section className="border-y border-slate-200 bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-400 mb-6">
+          <p className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
             Trusted by learners and engineering teams at world-class companies
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 opacity-75">
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14">
             {PARTNERS.map((partner) => (
               <div
                 key={partner.name}
-                className="flex items-center gap-2 text-slate-400 hover:text-slate-200 transition font-bold text-lg sm:text-xl tracking-tight"
+                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition font-bold text-lg sm:text-xl tracking-tight"
               >
-                <FaGlobe className="text-blue-500/60 text-base" />
+                <FaGlobe className="text-indigo-600 text-base" />
                 <span>{partner.name}</span>
               </div>
             ))}
@@ -358,27 +357,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── 3. SELECTION OF COURSES (Udemy Tabs & Cards Rail) ─────────── */}
+      {/* ─── 3. SELECTION OF COURSES (Clean Cards Rail) ─────────────────── */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div>
-          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
             A broad selection of courses
           </h2>
-          <p className="text-slate-400 text-base mt-2">
+          <p className="text-slate-600 text-base mt-2">
             Choose from hundreds of online video courses with new additions published every month.
           </p>
         </div>
 
-        {/* Topic Pill Filters (Udemy Standard) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-800">
+        {/* Topic Pill Filters */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200">
           {TOPIC_PILLS.map((topic) => (
             <button
               key={topic}
               onClick={() => handleTopicClick(topic)}
               className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition ${
                 activeTopic === topic
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                  : "bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white"
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                  : "bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-slate-200 shadow-sm"
               }`}
             >
               {topic}
@@ -392,31 +391,31 @@ export default function HomePage() {
             <Link
               key={course._id}
               to={`/courses/${course._id}`}
-              className="group bg-slate-900/80 border border-slate-800 hover:border-blue-500/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-blue-500/10 transition duration-300 flex flex-col no-underline"
+              className="group bg-white border border-slate-200 hover:border-indigo-400 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col no-underline"
             >
-              {/* Thumbnail Container with 16:9 ratio */}
-              <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
+              {/* Thumbnail Container */}
+              <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
                 <img
                   src={course.thumbnail}
                   alt={course.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                  <div className="w-11 h-11 rounded-full bg-blue-600/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                  <div className="w-11 h-11 rounded-full bg-indigo-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                     <FaPlay className="text-xs ml-0.5" />
                   </div>
                 </div>
 
-                {/* Badge (Bestseller, Highest Rated) */}
+                {/* Badge */}
                 {course.badge && (
                   <div className="absolute top-2.5 left-2.5">
                     <span
-                      className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded shadow-md ${
+                      className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded shadow-sm ${
                         course.badgeColor === "amber"
                           ? "bg-amber-400 text-slate-950"
                           : course.badgeColor === "purple"
                           ? "bg-purple-600 text-white"
-                          : "bg-blue-600 text-white"
+                          : "bg-indigo-600 text-white"
                       }`}
                     >
                       {course.badge}
@@ -428,16 +427,16 @@ export default function HomePage() {
               {/* Card Body */}
               <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                 <div className="space-y-1.5">
-                  <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-2 leading-snug">
                     {course.title}
                   </h3>
-                  <p className="text-xs text-slate-400 truncate">
+                  <p className="text-xs text-slate-500 truncate">
                     {course.instructor}
                   </p>
 
-                  {/* Rating row (Udemy Star display) */}
+                  {/* Rating row */}
                   <div className="flex items-center gap-1.5 pt-0.5">
-                    <span className="text-sm font-black text-amber-400">
+                    <span className="text-sm font-black text-amber-500">
                       {course.rating.toFixed(1)}
                     </span>
                     <div className="flex text-amber-400 text-xs">
@@ -450,23 +449,23 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  {/* Metadata pills */}
-                  <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-1">
+                  {/* Metadata */}
+                  <div className="flex items-center gap-2 text-[11px] text-slate-500 pt-1">
                     <span className="flex items-center gap-1">
-                      <FaClock className="text-slate-500" />
+                      <FaClock className="text-slate-400" />
                       {course.hours} hrs
                     </span>
                     <span>&bull;</span>
                     <span>{course.lectures} lectures</span>
                     <span>&bull;</span>
-                    <span className="text-blue-400 font-medium">{course.level}</span>
+                    <span className="text-indigo-600 font-medium">{course.level}</span>
                   </div>
                 </div>
 
                 {/* Price & Action */}
-                <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg font-black text-white">
+                    <span className="text-lg font-black text-slate-900">
                       {course.price === 0 ? "Free" : `$${course.price}`}
                     </span>
                     {course.originalPrice && (
@@ -475,7 +474,7 @@ export default function HomePage() {
                       </span>
                     )}
                   </div>
-                  <span className="text-xs font-bold text-blue-400 group-hover:text-blue-300 flex items-center gap-1">
+                  <span className="text-xs font-bold text-indigo-600 group-hover:text-indigo-700 flex items-center gap-1">
                     <span>View</span>
                     <FaArrowRight className="text-[10px]" />
                   </span>
@@ -489,7 +488,7 @@ export default function HomePage() {
         <div className="text-center pt-4">
           <Link
             to="/courses"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm border border-slate-200 shadow-sm transition"
           >
             <span>Browse Full Course Library (200+ Courses)</span>
             <FaArrowRight />
@@ -497,17 +496,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── 4. COURSERA VALUE PROP ("Why Learn on EduPlatform") ─────────── */}
-      <section className="py-20 bg-slate-900/50 border-t border-slate-800">
+      {/* ─── 4. COURSERA VALUE PROP ─────────────────────────────────────── */}
+      <section className="py-20 bg-white border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
               The EduPlatform Advantage
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
               Invest in your career with world-class learning
             </h2>
-            <p className="text-slate-400 text-base">
+            <p className="text-slate-600 text-base">
               Designed according to instructional science for maximum skill retention, practical experience, and career advancement.
             </p>
           </div>
@@ -518,60 +517,60 @@ export default function HomePage() {
                 icon: <FaLaptopCode />,
                 title: "Hands-On Projects",
                 desc: "Build portfolio-ready applications in React, Node, Python, and AWS with line-by-line guidance.",
-                color: "text-blue-400",
-                bg: "bg-blue-500/10",
+                color: "text-indigo-600",
+                bg: "bg-indigo-50",
               },
               {
                 icon: <FaBrain />,
                 title: "Gemini AI Career Navigator",
                 desc: "Personalized aptitude assessment accurately maps your strengths to high-paying tech roles.",
-                color: "text-purple-400",
-                bg: "bg-purple-500/10",
+                color: "text-purple-600",
+                bg: "bg-purple-50",
               },
               {
                 icon: <FaCertificate />,
                 title: "Verified Credentials",
                 desc: "Earn verified completion certificates recognized by hiring managers and tech recruiters.",
-                color: "text-emerald-400",
-                bg: "bg-emerald-500/10",
+                color: "text-emerald-600",
+                bg: "bg-emerald-50",
               },
               {
                 icon: <FaShieldAlt />,
                 title: "Flexible Lifetime Access",
                 desc: "Learn at your own pace on mobile, tablet, or desktop with 24/7 access to curriculum updates.",
-                color: "text-amber-400",
-                bg: "bg-amber-500/10",
+                color: "text-amber-600",
+                bg: "bg-amber-50",
               },
             ].map((card, idx) => (
               <div
                 key={idx}
-                className="p-6 rounded-2xl bg-[#0f1524] border border-slate-800 hover:border-slate-700 transition space-y-4"
+                className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:bg-white hover:border-indigo-300 hover:shadow-lg transition space-y-4"
               >
                 <div className={`w-12 h-12 rounded-xl ${card.bg} ${card.color} flex items-center justify-center text-2xl`}>
                   {card.icon}
                 </div>
-                <h3 className="text-lg font-bold text-white">{card.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{card.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900">{card.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{card.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── 5. LEARNER OUTCOMES & REVIEWS (Coursera Style) ─────────────── */}
+      {/* ─── 5. LEARNER OUTCOMES & REVIEWS ──────────────────────────────── */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
               Real Stories &bull; Real Results
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white mt-1">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-1">
               How learning on EduPlatform changes lives
             </h2>
           </div>
           <Link
             to="/assessment"
-            className="text-sm font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1.5"
+            className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5"
           >
             Take the AI Career Assessment &rarr;
           </Link>
@@ -581,7 +580,7 @@ export default function HomePage() {
           {OUTCOMES.map((story, i) => (
             <div
               key={i}
-              className="bg-[#0f1524] border border-slate-800 p-6 rounded-2xl flex flex-col justify-between space-y-5"
+              className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-5"
             >
               <div className="space-y-4">
                 <div className="flex text-amber-400 text-xs">
@@ -589,21 +588,21 @@ export default function HomePage() {
                     <FaStar key={s} />
                   ))}
                 </div>
-                <p className="text-slate-300 text-sm leading-relaxed italic">
+                <p className="text-slate-700 text-sm leading-relaxed italic">
                   "{story.text}"
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 flex items-center gap-3">
+              <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
                 <img
                   src={story.avatar}
                   alt={story.name}
-                  className="w-11 h-11 rounded-full object-cover border border-slate-700"
+                  className="w-11 h-11 rounded-full object-cover border border-slate-200"
                 />
                 <div>
-                  <div className="text-sm font-bold text-white">{story.name}</div>
-                  <div className="text-xs text-blue-400 font-medium">{story.role}</div>
-                  <div className="text-[11px] text-emerald-400 font-semibold">{story.increase}</div>
+                  <div className="text-sm font-bold text-slate-900">{story.name}</div>
+                  <div className="text-xs text-indigo-600 font-medium">{story.role}</div>
+                  <div className="text-[11px] text-emerald-600 font-semibold">{story.increase}</div>
                 </div>
               </div>
             </div>
@@ -611,22 +610,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── 6. BECOME AN INSTRUCTOR (Udemy Style CTA) ─────────────────── */}
-      <section className="py-16 bg-gradient-to-r from-blue-900/30 via-indigo-900/20 to-purple-900/30 border-y border-slate-800">
+      {/* ─── 6. BECOME AN INSTRUCTOR ────────────────────────────────────── */}
+      <section className="py-16 bg-gradient-to-r from-indigo-50 via-slate-50 to-blue-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 mx-auto flex items-center justify-center text-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 mx-auto flex items-center justify-center text-2xl">
             <FaChalkboardTeacher />
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-white">
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
             Become an instructor on EduPlatform
           </h2>
-          <p className="text-slate-300 text-base max-w-2xl mx-auto">
+          <p className="text-slate-600 text-base max-w-2xl mx-auto">
             Top instructors teach millions of students on EduPlatform. We provide the platform, course builder, and global audience to help you monetize your expertise.
           </p>
           <div className="pt-2">
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white font-bold text-sm shadow-xl transition"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl btn-premium text-white font-bold text-sm shadow-md transition"
             >
               <span>Start Teaching Today</span>
               <FaArrowRight className="text-xs" />
@@ -635,18 +634,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── 7. FOOTER (Coursera / Udemy Standard) ──────────────────────── */}
-      <footer className="bg-[#080b12] border-t border-slate-800/80 pt-16 pb-12 text-slate-400 text-sm">
+      {/* ─── 7. FOOTER (Clean Light Theme) ──────────────────────────────────── */}
+      <footer className="bg-white border-t border-slate-200 pt-16 pb-12 text-slate-600 text-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 pb-12 border-b border-slate-800">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 pb-12 border-b border-slate-200">
             <div className="col-span-2 space-y-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
                   <FaGraduationCap />
                 </div>
-                <span className="text-lg font-black text-white">EduPlatform</span>
+                <span className="text-lg font-black text-slate-900">EduPlatform</span>
               </div>
-              <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
+              <p className="text-xs text-slate-600 max-w-sm leading-relaxed">
                 Empowering learners worldwide through high-impact technical education, project-based curriculum, and AI-driven career guidance.
               </p>
               <div className="text-xs text-slate-400">
@@ -655,35 +654,35 @@ export default function HomePage() {
             </div>
 
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white">Explore</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">Explore</h4>
               <ul className="space-y-2 text-xs">
-                <li><Link to="/courses" className="hover:text-white transition">Course Library</Link></li>
-                <li><Link to="/assessment" className="hover:text-white transition">AI Career Explorer</Link></li>
-                <li><Link to="/courses?category=AI" className="hover:text-white transition">Artificial Intelligence</Link></li>
-                <li><Link to="/courses?category=Web%20Development" className="hover:text-white transition">Web Development</Link></li>
+                <li><Link to="/courses" className="hover:text-indigo-600 transition">Course Library</Link></li>
+                <li><Link to="/assessment" className="hover:text-indigo-600 transition">AI Career Explorer</Link></li>
+                <li><Link to="/courses?category=AI" className="hover:text-indigo-600 transition">Artificial Intelligence</Link></li>
+                <li><Link to="/courses?category=Web%20Development" className="hover:text-indigo-600 transition">Web Development</Link></li>
               </ul>
             </div>
 
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white">Community</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">Community</h4>
               <ul className="space-y-2 text-xs">
-                <li><Link to="/register" className="hover:text-white transition">Teach on EduPlatform</Link></li>
-                <li><Link to="/login" className="hover:text-white transition">Learner Portal</Link></li>
-                <li><Link to="/dashboard" className="hover:text-white transition">My Learning</Link></li>
+                <li><Link to="/register" className="hover:text-indigo-600 transition">Teach on EduPlatform</Link></li>
+                <li><Link to="/login" className="hover:text-indigo-600 transition">Learner Portal</Link></li>
+                <li><Link to="/dashboard" className="hover:text-indigo-600 transition">My Learning</Link></li>
               </ul>
             </div>
 
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white">Legal & Support</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">Legal & Support</h4>
               <ul className="space-y-2 text-xs">
-                <li><a href="#help" className="hover:text-white transition">Help & Support</a></li>
-                <li><a href="#terms" className="hover:text-white transition">Terms of Service</a></li>
-                <li><a href="#privacy" className="hover:text-white transition">Privacy Policy</a></li>
+                <li><a href="#help" className="hover:text-indigo-600 transition">Help & Support</a></li>
+                <li><a href="#terms" className="hover:text-indigo-600 transition">Terms of Service</a></li>
+                <li><a href="#privacy" className="hover:text-indigo-600 transition">Privacy Policy</a></li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
             <div>
               Designed for optimal accessibility and high-performance learning.
             </div>

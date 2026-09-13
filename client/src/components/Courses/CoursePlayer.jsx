@@ -266,17 +266,17 @@ export default function CoursePlayer() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#080b12] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500" />
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600" />
       </div>
     );
   }
 
   if (error || !course) {
     return (
-      <div className="min-h-screen bg-[#080b12] py-20 px-4 text-center">
+      <div className="min-h-screen bg-[#f8fafc] py-20 px-4 text-center">
         <AlertMessage type="error" message="Unable to load course classroom" />
-        <Link to="/courses" className="mt-4 inline-block text-blue-400 font-bold hover:underline">
+        <Link to="/courses" className="mt-4 inline-block text-indigo-600 font-bold hover:underline">
           &larr; Return to Courses
         </Link>
       </div>
@@ -284,23 +284,23 @@ export default function CoursePlayer() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080b12] text-slate-100 flex flex-col font-sans antialiased">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans antialiased">
       {/* ─── 1. UDEMY / COURSERA TOP CLASSROOM BAR ────────────────────── */}
-      <header className="bg-[#0e1322] border-b border-slate-800 px-4 sm:px-6 h-16 flex items-center justify-between gap-4 sticky top-0 z-40">
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 sm:px-6 h-16 flex items-center justify-between gap-4 sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-3 min-w-0">
           <Link
             to={`/courses/${courseId}`}
-            className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition flex-shrink-0"
+            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex-shrink-0"
             title="Back to Course Details"
           >
             <FaArrowLeft className="text-xs" />
           </Link>
 
           <div className="min-w-0">
-            <h1 className="text-sm sm:text-base font-bold text-white truncate">
+            <h1 className="text-sm sm:text-base font-bold text-slate-900 truncate">
               {course.title}
             </h1>
-            <p className="text-[11px] text-slate-400 truncate hidden sm:block">
+            <p className="text-[11px] text-slate-500 font-medium truncate hidden sm:block">
               {currentModule?.title} &bull; {currentLesson?.title}
             </p>
           </div>
@@ -310,20 +310,20 @@ export default function CoursePlayer() {
         <div className="flex items-center gap-4 flex-shrink-0">
           {/* Progress Widget (Udemy Style) */}
           <div className="hidden sm:flex items-center gap-3">
-            <div className="w-32 bg-slate-800 rounded-full h-2 overflow-hidden">
+            <div className="w-32 bg-slate-100 border border-slate-200 rounded-full h-2 overflow-hidden">
               <div
-                className="bg-gradient-to-r from-blue-500 to-emerald-400 h-2 rounded-full transition-all duration-300"
+                className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-xs font-bold text-slate-300">
+            <span className="text-xs font-bold text-slate-700">
               {progressPercent}% Complete
             </span>
           </div>
 
           <button
             onClick={() => setShowSidebar(!showSidebar)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-300 text-xs font-bold transition"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 text-xs font-bold transition"
           >
             <FaList />
             <span className="hidden md:inline">{showSidebar ? "Hide Curriculum" : "Show Curriculum"}</span>
@@ -343,30 +343,30 @@ export default function CoursePlayer() {
                 onComplete={() => toggleLessonCompletion(currentLesson._id)}
               />
             ) : (
-              <div className="bg-[#0f1524] border border-slate-800 rounded-2xl p-8 space-y-4 min-h-[360px] flex flex-col justify-center">
-                <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl">
+              <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-8 space-y-4 min-h-[360px] flex flex-col justify-center">
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center text-xl">
                   <FaBook />
                 </div>
-                <h2 className="text-2xl font-bold text-white">{currentLesson?.title}</h2>
-                <div className="text-slate-300 text-sm leading-relaxed whitespace-pre-line">
+                <h2 className="text-2xl font-bold text-slate-900">{currentLesson?.title}</h2>
+                <div className="text-slate-600 text-sm leading-relaxed whitespace-pre-line font-normal">
                   {currentLesson?.content?.textContent || currentLesson?.description}
                 </div>
               </div>
             )}
 
             {/* Navigation & Completion Bar below Video */}
-            <div className="bg-[#0e1422] border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-4">
+            <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePrevLesson}
-                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                 >
                   <FaStepBackward className="text-[10px]" />
                   <span>Previous</span>
                 </button>
                 <button
                   onClick={handleNextLesson}
-                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                 >
                   <span>Next</span>
                   <FaStepForward className="text-[10px]" />
@@ -377,8 +377,8 @@ export default function CoursePlayer() {
                 onClick={() => toggleLessonCompletion(currentLesson?._id)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition ${
                   progress[currentLesson?._id]?.completed
-                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                    : "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30"
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-300"
+                    : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20"
                 }`}
               >
                 <FaCheck />
@@ -391,9 +391,9 @@ export default function CoursePlayer() {
             </div>
 
             {/* UDEMY / COURSERA TABBED CONTENT BAR */}
-            <div className="bg-[#0e1422] border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
               {/* Tab Header Navigation */}
-              <div className="flex items-center border-b border-slate-800 px-4 sm:px-6 bg-[#0c101a] gap-6">
+              <div className="flex items-center border-b border-slate-200 px-4 sm:px-6 bg-slate-50/80 gap-6">
                 {[
                   { id: "overview", label: "Overview", icon: <FaBookOpen /> },
                   { id: "resources", label: "Resources & Files", icon: <FaFolderOpen /> },
@@ -405,8 +405,8 @@ export default function CoursePlayer() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`py-4 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition ${
                       activeTab === tab.id
-                        ? "border-blue-500 text-white"
-                        : "border-transparent text-slate-400 hover:text-slate-200"
+                        ? "border-indigo-600 text-indigo-600"
+                        : "border-transparent text-slate-500 hover:text-slate-800"
                     }`}
                   >
                     <span>{tab.icon}</span>
@@ -419,38 +419,38 @@ export default function CoursePlayer() {
               <div className="p-6">
                 {activeTab === "overview" && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-white">{currentLesson?.title}</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed">
+                    <h3 className="text-lg font-bold text-slate-900">{currentLesson?.title}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
                       {currentLesson?.description ||
                         "In this lesson, we break down core design principles and build functional components with best engineering practices."}
                     </p>
-                    <div className="pt-3 border-t border-slate-800/80 flex items-center gap-6 text-xs text-slate-400">
-                      <span>Instructor: <strong className="text-slate-200">{course.user?.username || "Lead Faculty"}</strong></span>
-                      <span>Skill Level: <strong className="text-blue-400">{course.difficulty || "All Levels"}</strong></span>
-                      <span>Estimated Time: <strong className="text-slate-200">20 mins</strong></span>
+                    <div className="pt-3 border-t border-slate-100 flex items-center gap-6 text-xs text-slate-500 font-medium">
+                      <span>Instructor: <strong className="text-slate-800">{course.user?.username || "Lead Faculty"}</strong></span>
+                      <span>Skill Level: <strong className="text-indigo-600">{course.difficulty || "All Levels"}</strong></span>
+                      <span>Estimated Time: <strong className="text-slate-800">20 mins</strong></span>
                     </div>
                   </div>
                 )}
 
                 {activeTab === "resources" && (
                   <div className="space-y-3">
-                    <h3 className="text-sm font-bold text-white">Lecture Downloads & References</h3>
+                    <h3 className="text-sm font-bold text-slate-900">Lecture Downloads & References</h3>
                     <div className="space-y-2">
-                      <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2.5 text-slate-200">
-                          <FaCode className="text-blue-400 text-sm" />
+                      <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2.5 text-slate-800">
+                          <FaCode className="text-indigo-600 text-sm" />
                           <span className="font-semibold">Starter Project Code & Architecture (.zip)</span>
                         </div>
-                        <span className="text-blue-400 font-bold hover:underline cursor-pointer">
+                        <span className="text-indigo-600 font-bold hover:underline cursor-pointer">
                           Download (4.2 MB)
                         </span>
                       </div>
-                      <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2.5 text-slate-200">
-                          <FaDownload className="text-indigo-400 text-sm" />
+                      <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2.5 text-slate-800">
+                          <FaDownload className="text-indigo-600 text-sm" />
                           <span className="font-semibold">Cheat Sheet & API Quick Reference (.pdf)</span>
                         </div>
-                        <span className="text-blue-400 font-bold hover:underline cursor-pointer">
+                        <span className="text-indigo-600 font-bold hover:underline cursor-pointer">
                           Download (1.1 MB)
                         </span>
                       </div>
@@ -466,26 +466,26 @@ export default function CoursePlayer() {
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Type a personal note for this lesson..."
                         rows={3}
-                        className="w-full bg-slate-900 border border-slate-700 text-slate-100 p-3 rounded-xl text-xs focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 p-3 rounded-xl text-xs focus:outline-none focus:border-indigo-600 focus:bg-white"
                       />
                       <button
                         onClick={handleSaveNote}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition"
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition"
                       >
                         Save Note
                       </button>
                     </div>
 
                     {savedNotes.length > 0 && (
-                      <div className="space-y-2 pt-2 border-t border-slate-800">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase">Your Saved Notes</h4>
+                      <div className="space-y-2 pt-2 border-t border-slate-100">
+                        <h4 className="text-xs font-bold text-slate-500 uppercase">Your Saved Notes</h4>
                         {savedNotes.map((n) => (
-                          <div key={n.id} className="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs space-y-1">
-                            <div className="flex justify-between text-slate-400 text-[10px]">
-                              <span className="font-bold text-blue-400">{n.lessonTitle}</span>
+                          <div key={n.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                            <div className="flex justify-between text-slate-500 text-[10px]">
+                              <span className="font-bold text-indigo-600">{n.lessonTitle}</span>
                               <span>{n.date}</span>
                             </div>
-                            <p className="text-slate-200">{n.text}</p>
+                            <p className="text-slate-800">{n.text}</p>
                           </div>
                         ))}
                       </div>
@@ -495,20 +495,20 @@ export default function CoursePlayer() {
 
                 {activeTab === "qa" && (
                   <div className="space-y-4">
-                    <h3 className="text-sm font-bold text-white">Questions & Discussions</h3>
-                    <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800 text-xs space-y-2">
+                    <h3 className="text-sm font-bold text-slate-900">Questions & Discussions</h3>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center font-bold text-[10px] text-white">
+                        <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-[10px] text-white">
                           A
                         </div>
-                        <span className="font-bold text-slate-200">Alex Tan</span>
+                        <span className="font-bold text-slate-800">Alex Tan</span>
                         <span className="text-slate-500">2 days ago</span>
                       </div>
-                      <p className="text-slate-300">
+                      <p className="text-slate-700">
                         Is it better to handle state normalization on the client or let backend handle response shaping?
                       </p>
-                      <div className="pl-4 border-l-2 border-slate-800 text-slate-400 text-[11px] pt-1">
-                        <strong className="text-blue-400">Instructor:</strong> Whenever possible, keep payload formats consistent from your REST/GraphQL layer to minimize client transformations!
+                      <div className="pl-4 border-l-2 border-slate-200 text-slate-600 text-[11px] pt-1">
+                        <strong className="text-indigo-600">Instructor:</strong> Whenever possible, keep payload formats consistent from your REST/GraphQL layer to minimize client transformations!
                       </div>
                     </div>
                   </div>
@@ -520,28 +520,28 @@ export default function CoursePlayer() {
 
         {/* RIGHT COLUMN: COLLAPSIBLE CURRICULUM DRAWER (Udemy Standard) */}
         {showSidebar && (
-          <aside className="w-80 lg:w-96 bg-[#0c101a] border-l border-slate-800 flex flex-col h-full flex-shrink-0">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <aside className="w-80 lg:w-96 bg-white border-l border-slate-200 flex flex-col h-full flex-shrink-0 shadow-sm">
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-sm text-white">Course Content</h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <h3 className="font-bold text-sm text-slate-900">Course Content</h3>
+                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
                   {completedLessonsCount} of {totalLessonsCount} completed ({progressPercent}%)
                 </p>
               </div>
             </div>
 
             {/* Curriculum Accordion */}
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-800/80">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
               {modules.map((mod, mIdx) => (
                 <div key={mod._id || mIdx}>
-                  <div className="p-3.5 bg-slate-900/60 font-bold text-xs text-slate-200 flex items-center justify-between">
+                  <div className="p-3.5 bg-slate-50 font-bold text-xs text-slate-800 flex items-center justify-between border-b border-slate-100">
                     <span className="line-clamp-1">{mod.title}</span>
-                    <span className="text-[10px] text-slate-400 flex-shrink-0 ml-2">
+                    <span className="text-[10px] text-slate-500 font-medium flex-shrink-0 ml-2">
                       {mod.lessons?.length || 0} items
                     </span>
                   </div>
 
-                  <div className="divide-y divide-slate-800/40">
+                  <div className="divide-y divide-slate-100">
                     {mod.lessons?.map((les, lIdx) => {
                       const isCurrent = currentModuleIndex === mIdx && currentLessonIndex === lIdx;
                       const isDone = progress[les._id]?.completed;
@@ -552,8 +552,8 @@ export default function CoursePlayer() {
                           onClick={() => handleLessonSelect(mIdx, lIdx)}
                           className={`p-3 text-xs flex items-start gap-3 cursor-pointer transition ${
                             isCurrent
-                              ? "bg-blue-600/15 border-l-4 border-blue-500 text-white"
-                              : "hover:bg-slate-800/40 text-slate-300"
+                              ? "bg-indigo-50 border-l-4 border-indigo-600 text-indigo-950"
+                              : "hover:bg-slate-50 text-slate-700"
                           }`}
                         >
                           <input
@@ -563,18 +563,18 @@ export default function CoursePlayer() {
                               e.stopPropagation();
                               toggleLessonCompletion(les._id);
                             }}
-                            className="mt-0.5 rounded text-blue-600 focus:ring-0 cursor-pointer"
+                            className="mt-0.5 rounded text-indigo-600 focus:ring-0 cursor-pointer"
                           />
 
                           <div className="flex-1 min-w-0">
-                            <p className={`font-semibold line-clamp-2 ${isCurrent ? "text-blue-300" : ""}`}>
+                            <p className={`font-semibold line-clamp-2 ${isCurrent ? "text-indigo-900 font-bold" : ""}`}>
                               {les.title}
                             </p>
                             <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-1">
                               {les.type === "video" ? (
-                                <FaPlay className="text-[8px] text-blue-400" />
+                                <FaPlay className="text-[8px] text-indigo-600" />
                               ) : (
-                                <FaBook className="text-[8px] text-indigo-400" />
+                                <FaBook className="text-[8px] text-indigo-500" />
                               )}
                               <span>{les.type === "video" ? "15:00" : "Reading"}</span>
                             </div>

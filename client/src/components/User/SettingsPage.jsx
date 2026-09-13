@@ -148,9 +148,9 @@ const Settings = () => {
       disabled={disabled}
       type="button"
       className={`${
-        enabled ? 'text-cyan-400' : 'text-slate-600'
-      } text-2xl transition-all duration-200 ${
-        disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 cursor-pointer'
+        enabled ? 'text-indigo-600' : 'text-slate-300'
+      } text-3xl transition-all duration-200 ${
+        disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'
       } focus:outline-none`}
     >
       {enabled ? <FaToggleOn /> : <FaToggleOff />}
@@ -159,36 +159,32 @@ const Settings = () => {
 
   // Tab navigation
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: FaUser, color: 'text-purple-400 bg-purple-500/10' },
-    { id: 'career', label: 'Career Exploration', icon: FaRocket, color: 'text-cyan-400 bg-cyan-500/10' },
-    { id: 'interests', label: 'Skills & Interests', icon: FaLightbulb, color: 'text-amber-400 bg-amber-500/10' },
-    { id: 'notifications', label: 'Notifications', icon: FaBell, color: 'text-rose-400 bg-rose-500/10' },
-    { id: 'appearance', label: 'Appearance', icon: FaPalette, color: 'text-emerald-400 bg-emerald-500/10' },
-    { id: 'privacy', label: 'Privacy & Security', icon: FaShieldAlt, color: 'text-indigo-400 bg-indigo-500/10' },
-    { id: 'learning', label: 'Learning', icon: FaDesktop, color: 'text-sky-400 bg-sky-500/10' },
-    { id: 'localization', label: 'Language & Region', icon: FaGlobe, color: 'text-teal-400 bg-teal-500/10' },
+    { id: 'profile', label: 'Profile', icon: FaUser },
+    { id: 'career', label: 'Career Exploration', icon: FaRocket },
+    { id: 'interests', label: 'Skills & Interests', icon: FaLightbulb },
+    { id: 'notifications', label: 'Notifications', icon: FaBell },
+    { id: 'appearance', label: 'Appearance', icon: FaPalette },
+    { id: 'privacy', label: 'Privacy & Security', icon: FaShieldAlt },
+    { id: 'learning', label: 'Learning', icon: FaDesktop },
+    { id: 'localization', label: 'Language & Region', icon: FaGlobe },
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] text-slate-100 relative overflow-hidden py-12">
-      {/* Floating background neon glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cyan-900/10 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="container mx-auto px-4 relative z-10">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 py-12">
+      <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
-        <div className="mb-10 max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent mb-2">
-            Settings
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+            Account Settings
           </h1>
-          <p className="text-slate-400 text-lg">Customize your learning experience and preferences</p>
+          <p className="text-slate-500 font-medium text-base">Customize your learning experience and preferences</p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:w-1/4">
-            <div className="bg-white/3 backdrop-blur-xl border border-white/5 shadow-2xl p-6 rounded-2xl">
-              <nav className="space-y-2">
+            <div className="bg-white border border-slate-200 shadow-sm p-4 rounded-2xl sticky top-20">
+              <nav className="space-y-1.5">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
@@ -197,14 +193,14 @@ const Settings = () => {
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-left transition-all duration-200 ${
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left font-semibold text-sm transition-all duration-150 ${
                         isActive
-                          ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-[0_0_20px_rgba(124,58,237,0.35)]'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                       }`}
                     >
-                      <Icon className={`text-lg ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                      <span className="font-semibold text-sm tracking-wide">{tab.label}</span>
+                      <Icon className={`text-base ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                      <span>{tab.label}</span>
                     </button>
                   );
                 })}
@@ -214,59 +210,59 @@ const Settings = () => {
 
           {/* Content Area */}
           <div className="lg:w-3/4">
-            <div className="bg-white/3 backdrop-blur-xl border border-white/5 shadow-2xl p-8 rounded-2xl">
+            <div className="bg-white border border-slate-200 shadow-sm p-6 sm:p-8 rounded-3xl">
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="p-2 rounded-lg bg-purple-500/10 mr-3.5">
-                      <FaUser className="text-purple-400 text-xl" />
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <div className="p-2.5 rounded-xl bg-indigo-50 border border-indigo-100 mr-3.5">
+                      <FaUser className="text-indigo-600 text-lg" />
                     </div>
                     Profile Information
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         First Name
                       </label>
                       <input
                         type="text"
                         value={settings.profile.firstName}
                         onChange={(e) => handleSettingChange('profile', 'firstName', e.target.value)}
-                        className="w-full p-3 bg-[#090b11] border border-white/10 text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none rounded-lg transition duration-200"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:bg-white focus:outline-none rounded-xl font-medium text-sm transition duration-150"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         Last Name
                       </label>
                       <input
                         type="text"
                         value={settings.profile.lastName}
                         onChange={(e) => handleSettingChange('profile', 'lastName', e.target.value)}
-                        className="w-full p-3 bg-[#090b11] border border-white/10 text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none rounded-lg transition duration-200"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:bg-white focus:outline-none rounded-xl font-medium text-sm transition duration-150"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Email
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                        Email Address
                       </label>
                       <input
                         type="email"
                         value={settings.profile.email}
                         onChange={(e) => handleSettingChange('profile', 'email', e.target.value)}
-                        className="w-full p-3 bg-[#090b11] border border-white/10 text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none rounded-lg transition duration-200"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:bg-white focus:outline-none rounded-xl font-medium text-sm transition duration-150"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         Phone
                       </label>
                       <input
                         type="tel"
                         value={settings.profile.phone}
                         onChange={(e) => handleSettingChange('profile', 'phone', e.target.value)}
-                        className="w-full p-3 bg-[#090b11] border border-white/10 text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none rounded-lg transition duration-200"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:bg-white focus:outline-none rounded-xl font-medium text-sm transition duration-150"
                       />
                     </div>
                   </div>
@@ -276,15 +272,15 @@ const Settings = () => {
               {/* Career Exploration Tab */}
               {activeTab === 'career' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="p-2 rounded-lg bg-cyan-500/10 mr-3.5">
-                      <FaRocket className="text-cyan-400 text-xl" />
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <div className="p-2.5 rounded-xl bg-indigo-50 border border-indigo-100 mr-3.5">
+                      <FaRocket className="text-indigo-600 text-lg" />
                     </div>
                     Career Exploration
                   </h2>
                   <div className="space-y-6">
-                    <div className="bg-[#090b11]/40 border border-white/5 p-6 rounded-xl">
-                      <h3 className="font-semibold text-white text-base mb-4">Experience Level</h3>
+                    <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl">
+                      <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider mb-4">Experience Level</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
                           { value: 'beginner', label: 'Beginner', desc: 'New to the field' },
@@ -297,14 +293,14 @@ const Settings = () => {
                               key={level.value}
                               type="button"
                               onClick={() => handleSettingChange('career', 'experienceLevel', level.value)}
-                              className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                              className={`p-4 rounded-xl border-2 transition-all duration-150 text-left ${
                                 isSelected
-                                  ? 'border-purple-500 bg-purple-500/10 text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
-                                  : 'border-white/10 bg-[#090b11] text-slate-400 hover:border-purple-500/20 hover:text-slate-200'
+                                  ? 'border-indigo-600 bg-white text-indigo-900 shadow-md ring-2 ring-indigo-600/10'
+                                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                               }`}
                             >
-                              <div className="font-semibold text-white">{level.label}</div>
-                              <div className={`text-sm mt-1 ${isSelected ? 'text-purple-400' : 'text-slate-500'}`}>{level.desc}</div>
+                              <div className="font-bold text-slate-900">{level.label}</div>
+                              <div className={`text-xs mt-1 font-medium ${isSelected ? 'text-indigo-600' : 'text-slate-500'}`}>{level.desc}</div>
                             </button>
                           );
                         })}
@@ -317,15 +313,15 @@ const Settings = () => {
               {/* Skills & Interests Tab */}
               {activeTab === 'interests' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="p-2 rounded-lg bg-amber-500/10 mr-3.5">
-                      <FaLightbulb className="text-amber-400 text-xl" />
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 mr-3.5">
+                      <FaLightbulb className="text-amber-600 text-lg" />
                     </div>
                     Skills & Interests
                   </h2>
                   <div className="space-y-6">
-                    <div className="bg-[#090b11]/40 border border-white/5 p-6 rounded-xl">
-                      <h3 className="font-semibold text-white text-base mb-4">Learning Style</h3>
+                    <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl">
+                      <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider mb-4">Learning Style</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
                           { value: 'visual', label: 'Visual', desc: 'Images & visuals' },
@@ -339,14 +335,14 @@ const Settings = () => {
                               key={style.value}
                               type="button"
                               onClick={() => handleSettingChange('interests', 'learningStyle', style.value)}
-                              className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                              className={`p-4 rounded-xl border-2 transition-all duration-150 text-left ${
                                 isSelected
-                                  ? 'border-cyan-500 bg-cyan-500/10 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
-                                  : 'border-white/10 bg-[#090b11] text-slate-400 hover:border-cyan-500/20 hover:text-slate-200'
+                                  ? 'border-indigo-600 bg-white text-indigo-900 shadow-md ring-2 ring-indigo-600/10'
+                                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                               }`}
                             >
-                              <div className="font-semibold text-white">{style.label}</div>
-                              <div className={`text-sm mt-1 ${isSelected ? 'text-cyan-400' : 'text-slate-500'}`}>{style.desc}</div>
+                              <div className="font-bold text-slate-900">{style.label}</div>
+                              <div className={`text-xs mt-1 font-medium ${isSelected ? 'text-indigo-600' : 'text-slate-500'}`}>{style.desc}</div>
                             </button>
                           );
                         })}
@@ -359,27 +355,27 @@ const Settings = () => {
               {/* Notifications Tab */}
               {activeTab === 'notifications' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="p-2 rounded-lg bg-rose-500/10 mr-3.5">
-                      <FaBell className="text-rose-400 text-xl" />
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 mr-3.5">
+                      <FaBell className="text-rose-600 text-lg" />
                     </div>
                     Notification Preferences
                   </h2>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-5 bg-[#090b11]/40 border border-white/5 rounded-xl">
+                    <div className="flex items-center justify-between p-5 bg-slate-50 border border-slate-200 rounded-2xl">
                       <div>
-                        <h3 className="font-semibold text-white">Email Notifications</h3>
-                        <p className="text-sm text-slate-400 mt-1">Receive notifications via email</p>
+                        <h3 className="font-bold text-slate-900 text-sm">Email Notifications</h3>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">Receive notifications and digest updates via email</p>
                       </div>
                       <Toggle
                         enabled={settings.notifications.emailNotifications}
                         onChange={(value) => handleSettingChange('notifications', 'emailNotifications', value)}
                       />
                     </div>
-                    <div className="flex items-center justify-between p-5 bg-[#090b11]/40 border border-white/5 rounded-xl">
+                    <div className="flex items-center justify-between p-5 bg-slate-50 border border-slate-200 rounded-2xl">
                       <div>
-                        <h3 className="font-semibold text-white">Push Notifications</h3>
-                        <p className="text-sm text-slate-400 mt-1">Receive push notifications in browser</p>
+                        <h3 className="font-bold text-slate-900 text-sm">Push Notifications</h3>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">Receive immediate push notifications in your browser</p>
                       </div>
                       <Toggle
                         enabled={settings.notifications.pushNotifications}
@@ -393,36 +389,36 @@ const Settings = () => {
               {/* Appearance Tab */}
               {activeTab === 'appearance' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="p-2 rounded-lg bg-emerald-500/10 mr-3.5">
-                      <FaPalette className="text-emerald-400 text-xl" />
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 mr-3.5">
+                      <FaPalette className="text-emerald-600 text-lg" />
                     </div>
                     Appearance & Theme
                   </h2>
                   <div className="space-y-6">
-                    <div className="bg-[#090b11]/40 border border-white/5 p-6 rounded-xl">
-                      <h3 className="font-semibold text-white text-base mb-4">Theme</h3>
+                    <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl">
+                      <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider mb-4">Theme</h3>
                       <div className="grid grid-cols-3 gap-4">
                         {[
-                          { value: 'light', label: 'Light', icon: FaSun },
+                          { value: 'light', label: 'Light (Active)', icon: FaSun },
                           { value: 'dark', label: 'Dark', icon: FaMoon },
-                          { value: 'auto', label: 'Auto', icon: FaDesktop }
+                          { value: 'auto', label: 'System', icon: FaDesktop }
                         ].map((theme) => {
                           const Icon = theme.icon;
-                          const isSelected = settings.appearance.theme === theme.value;
+                          const isSelected = settings.appearance.theme === theme.value || theme.value === 'light';
                           return (
                             <button
                               key={theme.value}
                               type="button"
                               onClick={() => handleSettingChange('appearance', 'theme', theme.value)}
-                              className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center ${
+                              className={`p-5 rounded-xl border-2 transition-all duration-150 flex flex-col items-center justify-center ${
                                 isSelected
-                                  ? 'border-purple-500 bg-purple-500/10 text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
-                                  : 'border-white/10 bg-[#090b11] text-slate-400 hover:border-purple-500/20 hover:text-slate-200'
+                                  ? 'border-indigo-600 bg-white text-indigo-900 shadow-md ring-2 ring-indigo-600/10'
+                                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                               }`}
                             >
-                              <Icon className={`text-2xl mb-2.5 ${isSelected ? 'text-purple-400' : 'text-slate-400'}`} />
-                              <span className="font-semibold text-sm">{theme.label}</span>
+                              <Icon className={`text-2xl mb-2 ${isSelected ? 'text-indigo-600' : 'text-slate-400'}`} />
+                              <span className="font-bold text-sm text-slate-900">{theme.label}</span>
                             </button>
                           );
                         })}
@@ -435,17 +431,17 @@ const Settings = () => {
               {/* Privacy Tab */}
               {activeTab === 'privacy' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="p-2 rounded-lg bg-indigo-500/10 mr-3.5">
-                      <FaShieldAlt className="text-indigo-400 text-xl" />
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <div className="p-2.5 rounded-xl bg-indigo-50 border border-indigo-100 mr-3.5">
+                      <FaShieldAlt className="text-indigo-600 text-lg" />
                     </div>
                     Privacy & Security
                   </h2>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-5 bg-[#090b11]/40 border border-white/5 rounded-xl">
+                    <div className="flex items-center justify-between p-5 bg-slate-50 border border-slate-200 rounded-2xl">
                       <div>
-                        <h3 className="font-semibold text-white">Two-Factor Authentication</h3>
-                        <p className="text-sm text-slate-400 mt-1">Add an extra layer of security to your account</p>
+                        <h3 className="font-bold text-slate-900 text-sm">Two-Factor Authentication</h3>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">Add an extra verification layer to your account</p>
                       </div>
                       <Toggle
                         enabled={settings.privacy.twoFactorAuth}
@@ -459,17 +455,17 @@ const Settings = () => {
               {/* Learning Tab */}
               {activeTab === 'learning' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="p-2 rounded-lg bg-sky-500/10 mr-3.5">
-                      <FaDesktop className="text-sky-400 text-xl" />
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <div className="p-2.5 rounded-xl bg-sky-50 border border-sky-200 mr-3.5">
+                      <FaDesktop className="text-sky-600 text-lg" />
                     </div>
                     Learning Preferences
                   </h2>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-5 bg-[#090b11]/40 border border-white/5 rounded-xl">
+                    <div className="flex items-center justify-between p-5 bg-slate-50 border border-slate-200 rounded-2xl">
                       <div>
-                        <h3 className="font-semibold text-white">Autoplay Videos</h3>
-                        <p className="text-sm text-slate-400 mt-1">Automatically play next video in the series</p>
+                        <h3 className="font-bold text-slate-900 text-sm">Autoplay Next Lecture</h3>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">Automatically advance to the next lesson</p>
                       </div>
                       <Toggle
                         enabled={settings.learning.autoplay}
@@ -483,23 +479,23 @@ const Settings = () => {
               {/* Localization Tab */}
               {activeTab === 'localization' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="p-2 rounded-lg bg-teal-500/10 mr-3.5">
-                      <FaGlobe className="text-teal-400 text-xl" />
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <div className="p-2.5 rounded-xl bg-teal-50 border border-teal-200 mr-3.5">
+                      <FaGlobe className="text-teal-600 text-lg" />
                     </div>
                     Language & Region
                   </h2>
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-3">
-                        Language
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                        Preferred Language
                       </label>
                       <select
                         value={settings.localization.language}
                         onChange={(e) => handleSettingChange('localization', 'language', e.target.value)}
-                        className="w-full p-3 bg-[#090b11] border border-white/10 text-white rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none cursor-pointer"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:border-indigo-600 focus:bg-white focus:outline-none cursor-pointer font-medium text-sm transition duration-150"
                       >
-                        <option value="en">English</option>
+                        <option value="en">English (US)</option>
                         <option value="es">Spanish</option>
                         <option value="fr">French</option>
                         <option value="de">German</option>
@@ -510,11 +506,11 @@ const Settings = () => {
               )}
 
               {/* Save Button Section */}
-              <div className="mt-10 pt-6 border-t border-white/5">
+              <div className="mt-8 pt-6 border-t border-slate-100">
                 <div className="flex items-center justify-between">
                   <div>
                     {saveMessage && (
-                      <p className={`text-sm font-medium ${saveMessage.includes('Error') ? 'text-red-400 font-semibold' : 'text-emerald-400 font-semibold'}`}>
+                      <p className={`text-sm font-semibold ${saveMessage.includes('Error') ? 'text-rose-600' : 'text-emerald-600'}`}>
                         {saveMessage}
                       </p>
                     )}
@@ -522,7 +518,7 @@ const Settings = () => {
                   <button
                     onClick={handleSaveSettings}
                     disabled={isLoading}
-                    className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 hover:opacity-90 text-white rounded-xl shadow-[0_0_20px_rgba(124,58,237,0.3)] transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
+                    className="flex items-center space-x-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-600/20 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm"
                   >
                     <FaSave className="text-sm" />
                     <span>{isLoading ? 'Saving...' : 'Save Settings'}</span>

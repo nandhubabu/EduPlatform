@@ -38,27 +38,24 @@ const AddCourseSection = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-white flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-md w-full relative z-10 space-y-6">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex items-center justify-center px-4 py-12">
+      <div className="max-w-md w-full space-y-6">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-slate-400 hover:text-white transition text-sm font-medium"
+          className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition text-xs font-bold uppercase tracking-wider"
         >
-          <FaArrowLeft className="text-xs" />
+          <FaArrowLeft className="text-[10px]" />
           <span>Back</span>
         </button>
 
-        <div className="bg-[#0f1524] border border-slate-800 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xl shadow-md">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-xl shadow-lg shadow-indigo-600/20">
               <FaLayerGroup />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Add Course Section</h1>
-              <p className="text-xs text-slate-400 mt-0.5">Create a new module in your course syllabus</p>
+              <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">Add Course Section</h1>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">Create a new module in your course syllabus</p>
             </div>
           </div>
 
@@ -84,17 +81,17 @@ const AddCourseSection = () => {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                 Section Name / Module Title
               </label>
               <input
                 type="text"
                 placeholder="e.g. Introduction & Environment Setup"
-                className="w-full px-4 py-3 bg-slate-900/80 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm transition"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-sm font-medium transition duration-150"
                 {...formik.getFieldProps("sectionName")}
               />
               {formik.touched.sectionName && formik.errors.sectionName && (
-                <p className="text-rose-400 text-xs mt-1.5 font-medium">
+                <p className="text-rose-600 text-xs mt-1.5 font-medium">
                   {formik.errors.sectionName}
                 </p>
               )}
@@ -103,7 +100,7 @@ const AddCourseSection = () => {
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-sm shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold text-sm shadow-lg shadow-indigo-600/20 transition duration-150 flex items-center justify-center gap-2"
             >
               <FaPlus className="text-xs" />
               <span>{mutation.isPending ? "Creating..." : "Save Section"}</span>
