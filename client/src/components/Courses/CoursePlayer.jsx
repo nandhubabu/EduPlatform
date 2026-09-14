@@ -679,8 +679,26 @@ export default function CoursePlayer() {
     ];
   }, [course]);
 
-  const currentModule = modules[currentModuleIndex] || modules[0];
-  const currentLesson = currentModule?.lessons?.[currentLessonIndex] || currentModule?.lessons?.[0];
+  const currentModule =
+    (modules && modules[currentModuleIndex]) ||
+    (modules && modules[0]) || {
+      title: "1. Foundations & Architecture",
+      lessons: [],
+    };
+  const currentLessonsList = currentModule?.lessons || [];
+  const currentLesson =
+    currentLessonsList[currentLessonIndex] ||
+    currentLessonsList[0] || {
+      _id: "default-lec",
+      title: "Course Overview & Learning Strategy",
+      type: "video",
+      description: "Welcome to EduPlatform. Follow along with our project repositories.",
+      content: {
+        youtubeId: "SqcY0GlETPk",
+        videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
+        textContent: "Welcome to EduPlatform. Follow along with our curriculum.",
+      },
+    };
 
   // Calculate total lessons and completion stats
   const totalLessonsCount = useMemo(() => {
@@ -701,6 +719,7 @@ export default function CoursePlayer() {
   };
 
   const toggleLessonCompletion = (lessonId) => {
+    if (!lessonId) return;
     setProgress((prev) => ({
       ...prev,
       [lessonId]: {
@@ -711,7 +730,8 @@ export default function CoursePlayer() {
   };
 
   const handleNextLesson = () => {
-    if (currentLessonIndex < currentModule.lessons.length - 1) {
+    const lessons = currentModule?.lessons || [];
+    if (currentLessonIndex < lessons.length - 1) {
       setCurrentLessonIndex(currentLessonIndex + 1);
     } else if (currentModuleIndex < modules.length - 1) {
       setCurrentModuleIndex(currentModuleIndex + 1);
@@ -723,8 +743,9 @@ export default function CoursePlayer() {
     if (currentLessonIndex > 0) {
       setCurrentLessonIndex(currentLessonIndex - 1);
     } else if (currentModuleIndex > 0) {
+      const prevLessons = modules[currentModuleIndex - 1]?.lessons || [];
       setCurrentModuleIndex(currentModuleIndex - 1);
-      setCurrentLessonIndex(modules[currentModuleIndex - 1].lessons.length - 1);
+      setCurrentLessonIndex(Math.max(0, prevLessons.length - 1));
     }
   };
 
@@ -969,7 +990,7 @@ export default function CoursePlayer() {
             {currentLesson?.type === "video" ? (
               <YouTubePlayer
                 videoId={currentLesson?.content?.youtubeId || "SqcY0GlETPk"}
-                onComplete={() => toggleLessonCompletion(currentLesson._id)}
+                onComplete={() => currentLesson?._id && toggleLessonCompletion(currentLesson._id)}
               />
             ) : (
               <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-8 space-y-4 min-h-[360px] flex flex-col justify-center">
