@@ -25,6 +25,7 @@ import {
 } from "react-icons/fa";
 import { getCourseById } from "../../services/courseService";
 import AlertMessage from "../Alert/AlertMessage";
+import { getRealCourseById } from "../../data/realCourses";
 
 // YouTube Video Player Component
 const YouTubePlayer = ({ videoId, onProgress, onComplete, initialTime = 0 }) => {
@@ -120,11 +121,15 @@ export default function CoursePlayer() {
   const [savedNotes, setSavedNotes] = useState([]);
 
   // Fetch course
-  const { data: course, isLoading, error } = useQuery({
+  const { data: courseData, isLoading, error } = useQuery({
     queryKey: ["course", courseId],
     queryFn: () => getCourseById(courseId),
     enabled: !!courseId,
+    retry: false,
   });
+
+  const fallbackCourse = getRealCourseById(courseId);
+  const course = courseData || fallbackCourse;
 
   // Normalize curriculum to always have playable modules and lessons
   const modules = useMemo(() => {
@@ -132,24 +137,37 @@ export default function CoursePlayer() {
       return course.modules;
     }
     if (course?.sections && course.sections.length > 0) {
-      return [
-        {
-          _id: "mod-sections",
-          title: "Core Curriculum Sections",
-          lessons: course.sections.map((sec, idx) => ({
-            _id: sec._id || `sec-${idx}`,
-            title: sec.sectionName || `Section ${idx + 1}`,
-            type: "video",
-            description: `Comprehensive instruction and hands-on walkthrough for ${sec.sectionName || `Section ${idx + 1}`}.`,
-            content: {
-              videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-              youtubeId: "SqcY0GlETPk",
-              videoDuration: (sec.estimatedTime || 20) * 60,
-              textContent: `Welcome to ${sec.sectionName || `Lesson ${idx + 1}`}. Review the code breakdown and key principles covered in this module.`,
-            },
-          })),
-        },
-      ];
+      return course.sections.map((sec, sIdx) => ({
+        _id: sec._id || `sec-${sIdx}`,
+        title: `${sIdx + 1}. ${sec.sectionName || `Section ${sIdx + 1}`}`,
+        lessons: (sec.lectures && sec.lectures.length > 0)
+          ? sec.lectures.map((lec, lIdx) => ({
+              _id: `${sec._id || sIdx}-lec-${lIdx}`,
+              title: lec.title || `Lecture ${lIdx + 1}`,
+              type: "video",
+              description: `Comprehensive video lecture covering ${lec.title || `Lecture ${lIdx + 1}`}.`,
+              content: {
+                videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
+                youtubeId: "SqcY0GlETPk",
+                videoDuration: 900,
+                textContent: `Welcome to ${lec.title || `Lecture ${lIdx + 1}`}. In this lesson, we break down core architectural principles, analyze best practices, and work through hands-on code examples.`,
+              },
+            }))
+          : [
+              {
+                _id: `${sec._id || sIdx}-lec-0`,
+                title: `${sec.sectionName || `Lesson 1`} - Core Concepts`,
+                type: "video",
+                description: `Comprehensive instruction and walkthrough for ${sec.sectionName || `Section ${sIdx + 1}`}.`,
+                content: {
+                  videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
+                  youtubeId: "SqcY0GlETPk",
+                  videoDuration: (sec.estimatedTime || 20) * 60,
+                  textContent: `Welcome to ${sec.sectionName || `Section ${sIdx + 1}`}. Review the code breakdown and key principles covered in this module.`,
+                },
+              },
+            ],
+      }));
     }
     // Default fallback curriculum
     return [
@@ -264,7 +282,7 @@ export default function CoursePlayer() {
     setNotes("");
   };
 
-  if (isLoading) {
+  if (isLoading && !fallbackCourse) {
     return (
       <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600" />
@@ -272,7 +290,7 @@ export default function CoursePlayer() {
     );
   }
 
-  if (error || !course) {
+  if (!course && (error || !courseData)) {
     return (
       <div className="min-h-screen bg-[#f8fafc] py-20 px-4 text-center">
         <AlertMessage type="error" message="Unable to load course classroom" />

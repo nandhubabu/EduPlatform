@@ -21,6 +21,7 @@ import {
   FaChalkboardTeacher,
 } from "react-icons/fa";
 import { getAllCoursesAPI } from "../../reactQuery/courses/coursesAPI";
+import { REAL_COURSES } from "../../data/realCourses";
 
 /* ─── TRUSTED PARTNER LOGOS (Coursera Style) ────────────────────────── */
 const PARTNERS = [
@@ -42,78 +43,6 @@ const TOPIC_PILLS = [
   "Cloud & DevOps",
   "Cybersecurity",
   "UI/UX Design",
-];
-
-/* ─── CURATED COURSERA & UDEMY HIGHLIGHTS ───────────────────────────── */
-const CURATED_COURSES = [
-  {
-    _id: "curated-1",
-    title: "Full-Stack Web Development Bootcamp 2026: React, Node & Next.js",
-    instructor: "Dr. Angela Yu & Brad Traversy",
-    rating: 4.9,
-    reviewsCount: "24,810",
-    studentsCount: "142,500",
-    hours: 48,
-    lectures: 340,
-    level: "All Levels",
-    badge: "Bestseller",
-    badgeColor: "amber",
-    price: 19.99,
-    originalPrice: 94.99,
-    category: "Web Development",
-    thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    _id: "curated-2",
-    title: "Deep Learning & Generative AI Specialization with PyTorch & Gemini",
-    instructor: "Andrew Ng & DeepLearning.AI",
-    rating: 4.95,
-    reviewsCount: "18,400",
-    studentsCount: "98,200",
-    hours: 36,
-    lectures: 190,
-    level: "Intermediate",
-    badge: "Highest Rated",
-    badgeColor: "purple",
-    price: 24.99,
-    originalPrice: 109.99,
-    category: "AI",
-    thumbnail: "https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    _id: "curated-3",
-    title: "AWS Certified Solutions Architect & Cloud Engineering Masterclass",
-    instructor: "Stephane Maarek",
-    rating: 4.85,
-    reviewsCount: "31,200",
-    studentsCount: "175,000",
-    hours: 29,
-    lectures: 215,
-    level: "All Levels",
-    badge: "Hot & New",
-    badgeColor: "blue",
-    price: 16.99,
-    originalPrice: 84.99,
-    category: "Cloud",
-    thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    _id: "curated-4",
-    title: "Complete Python for Data Science, Analytics & Machine Learning",
-    instructor: "Jose Portilla",
-    rating: 4.88,
-    reviewsCount: "42,100",
-    studentsCount: "210,000",
-    hours: 42,
-    lectures: 280,
-    level: "Beginner",
-    badge: "Bestseller",
-    badgeColor: "amber",
-    price: 18.99,
-    originalPrice: 89.99,
-    category: "Data Science",
-    thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
-  },
 ];
 
 /* ─── TESTIMONIALS (Coursera Learner Outcomes) ───────────────────────── */
@@ -174,25 +103,25 @@ export default function HomePage() {
     }
   };
 
-  // Combine db courses with curated highlights for rich presentation
+  // Combine db courses with real curriculum dataset
   const displayedCourses = dbCourses && dbCourses.length > 0
-    ? dbCourses.slice(0, 4).map((c, idx) => ({
+    ? dbCourses.map((c, idx) => ({
         _id: c._id,
         title: c.title,
-        instructor: c.user?.username || "EduPlatform Instructor",
+        instructor: c.user?.username || c.instructor || "EduPlatform Instructor",
         rating: c.rating || 4.8,
-        reviewsCount: `${(idx + 1) * 380 + 120}`,
-        studentsCount: `${(idx + 1) * 1250 + 500}`,
-        hours: c.estimatedHours || 24,
-        lectures: c.sections?.length || 18,
-        level: c.difficulty || "All Levels",
-        badge: idx === 0 ? "Bestseller" : idx === 1 ? "Highest Rated" : "Top Pick",
-        badgeColor: idx === 0 ? "amber" : idx === 1 ? "purple" : "blue",
+        reviewsCount: c.reviewsCount || `${(idx + 1) * 380 + 120}`,
+        studentsCount: c.studentsCount || `${(idx + 1) * 1250 + 500}`,
+        hours: c.estimatedHours || c.duration || 24,
+        lectures: c.sections?.length || c.lectures || 18,
+        level: c.difficulty || c.level || "All Levels",
+        badge: c.badge || (idx === 0 ? "Bestseller" : idx === 1 ? "Highest Rated" : "Top Pick"),
+        badgeColor: c.badgeColor || (idx === 0 ? "amber" : idx === 1 ? "purple" : "blue"),
         thumbnail: c.thumbnail || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
         price: c.price || 19.99,
-        originalPrice: c.price ? (Number(c.price) * 3.5).toFixed(2) : "89.99",
+        originalPrice: c.originalPrice || (c.price ? (Number(c.price) * 3.5).toFixed(2) : "89.99"),
       }))
-    : CURATED_COURSES;
+    : REAL_COURSES;
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased overflow-x-hidden">

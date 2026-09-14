@@ -193,13 +193,13 @@ const predefinedQuestions = {
   ]
 };
 
-// Career recommendations based on interests
+// Career recommendations based on interests with real EduPlatform courses
 const careerRecommendations = {
   technology: {
-    title: "Technology & Development",
-    description: "You have a strong aptitude for technology and programming!",
-    suggestedRole: "Software Developer",
-    industry: "Technology",
+    title: "Technology & Software Development",
+    description: "You have a strong aptitude for building modern software, distributed architectures, and scalable web engineering!",
+    suggestedRole: "Full-Stack Software Engineer",
+    industry: "Technology & Software",
     certifications: [
       {
         name: "AWS Certified Solutions Architect",
@@ -208,370 +208,202 @@ const careerRecommendations = {
         level: "Associate"
       },
       {
-        name: "Microsoft Azure Fundamentals",
+        name: "Microsoft Azure Developer Associate",
         provider: "Microsoft",
-        link: "https://docs.microsoft.com/en-us/learn/certifications/azure-fundamentals/",
-        level: "Fundamental"
-      },
-      {
-        name: "Google Cloud Professional",
-        provider: "Google Cloud",
-        link: "https://cloud.google.com/certification/cloud-engineer",
-        level: "Professional"
-      },
-      {
-        name: "Cisco CCNA (Networking)",
-        provider: "Cisco",
-        link: "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/associate/ccna.html",
+        link: "https://learn.microsoft.com/en-us/credentials/certifications/azure-developer/",
         level: "Associate"
       },
       {
-        name: "Oracle Java SE Programmer",
-        provider: "Oracle",
-        link: "https://education.oracle.com/java-se-11-developer/pexam_1Z0-819",
+        name: "Google Cloud Professional Cloud Architect",
+        provider: "Google Cloud",
+        link: "https://cloud.google.com/certification/cloud-architect",
         level: "Professional"
+      },
+      {
+        name: "CompTIA Security+ (Cybersecurity Defense)",
+        provider: "CompTIA",
+        link: "https://www.comptia.org/certifications/security",
+        level: "Foundational"
       }
     ],
     courses: [
       {
-        name: "Full Stack Web Development Bootcamp",
-        provider: "Udemy/Coursera",
-        duration: "12-16 weeks",
-        type: "Comprehensive"
+        name: "Full-Stack Web Development Bootcamp 2026: React 19, Node.js & Next.js 15",
+        provider: "EduPlatform",
+        duration: "48 hours",
+        type: "Full-Stack Track",
+        courseId: "66a01b2c3d4e5f6a7b8c9d01"
       },
       {
-        name: "Cisco Networking Academy",
-        provider: "Cisco",
-        duration: "6-12 months",
-        type: "Professional Training"
+        name: "AWS Certified Solutions Architect & Cloud Engineering Masterclass",
+        provider: "EduPlatform",
+        duration: "40 hours",
+        type: "Cloud Architecture",
+        courseId: "66a01b2c3d4e5f6a7b8c9d03"
       },
       {
-        name: "Microsoft Learn for Developers",
-        provider: "Microsoft",
-        duration: "Self-paced",
-        type: "Free Online"
+        name: "Cybersecurity Defense & Ethical Hacking: Zero to Hero",
+        provider: "EduPlatform",
+        duration: "35 hours",
+        type: "Security Engineering",
+        courseId: "66a01b2c3d4e5f6a7b8c9d06"
       },
       {
-        name: "Google Developer Training",
-        provider: "Google",
-        duration: "Various",
-        type: "Specialized"
-      },
-      {
-        name: "IBM SkillsBuild",
-        provider: "IBM",
-        duration: "Flexible",
-        type: "Professional Development"
-      },
-      {
-        name: "AWS Cloud Computing Fundamentals",
-        provider: "Amazon Web Services",
-        duration: "4-6 weeks",
-        type: "Free Tier"
-      },
-      {
-        name: "Meta Front-End Developer Certificate",
-        provider: "Meta (Facebook)",
-        duration: "7 months",
-        type: "Professional Certificate"
-      },
-      {
-        name: "Google IT Support Certificate",
-        provider: "Google",
-        duration: "3-6 months",
-        type: "Entry Level"
-      },
-      {
-        name: "Oracle Cloud Infrastructure Foundations",
-        provider: "Oracle",
-        duration: "Self-paced",
-        type: "Free Training"
-      },
-      {
-        name: "Salesforce Trailhead",
-        provider: "Salesforce",
-        duration: "Self-paced",
-        type: "Free Learning"
-      },
-      {
-        name: "GitHub Learning Lab",
-        provider: "GitHub",
-        duration: "Self-paced",
-        type: "Free Interactive"
-      },
-      {
-        name: "Red Hat Enterprise Linux",
-        provider: "Red Hat",
-        duration: "Various",
-        type: "Open Source Training"
+        name: "Cross-Platform Mobile Development with Flutter & Dart 3",
+        provider: "EduPlatform",
+        duration: "32 hours",
+        type: "Mobile Engineering",
+        courseId: "66a01b2c3d4e5f6a7b8c9d07"
       }
     ],
     jobs: [
-      "Software Developer",
-      "Web Developer",
-      "Mobile App Developer",
-      "DevOps Engineer",
-      "Cloud Architect",
+      "Full-Stack Developer",
+      "Cloud Solutions Architect",
       "Cybersecurity Specialist",
-      "Network Engineer",
-      "Database Administrator"
+      "DevOps / SRE Engineer",
+      "Mobile App Developer",
+      "Backend Systems Engineer"
     ],
     icon: FaLaptopCode,
     color: "blue"
   },
   creative: {
-    title: "Creative & Design",
-    description: "You have excellent creative and design thinking skills!",
-    suggestedRole: "UI/UX Designer",
-    industry: "Design & Creative",
+    title: "Creative Design & UI/UX Architecture",
+    description: "You excel in visual design thinking, interactive prototyping, design systems, and user-centric digital experiences!",
+    suggestedRole: "Senior UI/UX Product Designer",
+    industry: "Design & Creative Technology",
     certifications: [
       {
-        name: "Adobe Certified Expert (ACE)",
-        provider: "Adobe",
-        link: "https://www.adobe.com/training/certification.html",
-        level: "Expert"
-      },
-      {
-        name: "Google UX Design Certificate",
+        name: "Google UX Design Professional Certificate",
         provider: "Google",
         link: "https://www.coursera.org/professional-certificates/google-ux-design",
         level: "Professional"
       },
       {
-        name: "HubSpot Content Marketing",
-        provider: "HubSpot",
-        link: "https://academy.hubspot.com/courses/content-marketing",
-        level: "Intermediate"
+        name: "Adobe Certified Professional in Visual Design",
+        provider: "Adobe",
+        link: "https://www.adobe.com/training/certification.html",
+        level: "Professional"
       },
       {
-        name: "Figma Academy Certification",
+        name: "Figma Academy Design System Certification",
         provider: "Figma",
         link: "https://www.figma.com/academy/",
-        level: "Beginner to Advanced"
-      },
-      {
-        name: "Canva Design School",
-        provider: "Canva",
-        link: "https://www.canva.com/designschool/",
-        level: "All Levels"
+        level: "Advanced"
       }
     ],
     courses: [
       {
-        name: "UI/UX Design Specialization",
-        provider: "Coursera/CalArts",
-        duration: "4-6 months",
-        type: "University Level"
+        name: "Modern UI/UX Design System & Product Architecture with Figma",
+        provider: "EduPlatform",
+        duration: "28 hours",
+        type: "Design Systems Track",
+        courseId: "66a01b2c3d4e5f6a7b8c9d05"
       },
       {
-        name: "Adobe Creative Suite Masterclass",
-        provider: "Adobe/Udemy",
-        duration: "8-12 weeks",
-        type: "Hands-on Training"
+        name: "Full-Stack Web Development Bootcamp 2026: Frontend & UI Mastery",
+        provider: "EduPlatform",
+        duration: "48 hours",
+        type: "Frontend Engineering",
+        courseId: "66a01b2c3d4e5f6a7b8c9d01"
       },
       {
-        name: "Google Digital Marketing Course",
-        provider: "Google",
-        duration: "3-6 months",
-        type: "Free Professional"
+        name: "Cross-Platform Mobile Development with Flutter & Dart 3",
+        provider: "EduPlatform",
+        duration: "32 hours",
+        type: "Mobile UI Design",
+        courseId: "66a01b2c3d4e5f6a7b8c9d07"
       },
       {
-        name: "Interaction Design Foundation",
-        provider: "IxDF",
-        duration: "Self-paced",
-        type: "Academic"
-      },
-      {
-        name: "Meta Social Media Marketing Certificate",
-        provider: "Meta (Facebook)",
-        duration: "4-6 months",
-        type: "Professional Certificate"
-      },
-      {
-        name: "Google Creative Certification",
-        provider: "Google Skillshop",
-        duration: "Self-paced",
-        type: "Free Certification"
-      },
-      {
-        name: "HubSpot Academy Design Courses",
-        provider: "HubSpot",
-        duration: "Self-paced",
-        type: "Free Training"
-      },
-      {
-        name: "Microsoft Design Fundamentals",
-        provider: "Microsoft Learn",
-        duration: "Self-paced",
-        type: "Free Online"
-      },
-      {
-        name: "Salesforce UX Design",
-        provider: "Salesforce Trailhead",
-        duration: "Self-paced",
-        type: "Free Learning Path"
-      },
-      {
-        name: "IBM Design Thinking",
-        provider: "IBM",
-        duration: "2-4 weeks",
-        type: "Free Course"
-      },
-      {
-        name: "Figma Academy",
-        provider: "Figma",
-        duration: "Self-paced",
-        type: "Free Interactive"
-      },
-      {
-        name: "Sketch for Beginners",
-        provider: "Sketch",
-        duration: "Self-paced",
-        type: "Free Resources"
+        name: "Tech Product Management & Agile Leadership for Engineers",
+        provider: "EduPlatform",
+        duration: "25 hours",
+        type: "Product Discovery",
+        courseId: "66a01b2c3d4e5f6a7b8c9d08"
       }
     ],
     jobs: [
       "UI/UX Designer",
-      "Graphic Designer",
-      "Digital Marketing Specialist",
-      "Content Creator",
-      "Video Editor",
-      "Brand Designer",
-      "Motion Graphics Designer",
-      "Creative Director"
+      "Product Designer",
+      "Design Systems Engineer",
+      "Frontend UI Developer",
+      "Creative Director",
+      "Motion & Interaction Designer"
     ],
     icon: FaBrain,
     color: "purple"
   },
   analytical: {
-    title: "Data & Analytics",
-    description: "You excel at analytical thinking and problem-solving!",
-    suggestedRole: "Data Scientist",
-    industry: "Data & Analytics",
+    title: "Data Science, Machine Learning & AI",
+    description: "You excel at statistical reasoning, quantitative modeling, machine learning pipelines, and generative AI systems!",
+    suggestedRole: "Machine Learning & Data Scientist",
+    industry: "Artificial Intelligence & Data Science",
     certifications: [
       {
-        name: "Google Data Analytics Certificate",
-        provider: "Google",
-        link: "https://www.coursera.org/professional-certificates/google-data-analytics",
+        name: "Google Professional Data Engineer",
+        provider: "Google Cloud",
+        link: "https://cloud.google.com/certification/data-engineer",
         level: "Professional"
       },
       {
         name: "Microsoft Certified: Azure Data Scientist",
         provider: "Microsoft",
-        link: "https://docs.microsoft.com/en-us/learn/certifications/azure-data-scientist/",
+        link: "https://learn.microsoft.com/en-us/credentials/certifications/azure-data-scientist/",
         level: "Associate"
       },
       {
-        name: "IBM Data Science Professional",
-        provider: "IBM",
-        link: "https://www.coursera.org/professional-certificates/ibm-data-science",
-        level: "Professional"
-      },
-      {
-        name: "SAS Certified Specialist",
-        provider: "SAS",
-        link: "https://www.sas.com/en_us/certification.html",
-        level: "Specialist"
-      },
-      {
-        name: "Tableau Desktop Specialist",
-        provider: "Tableau",
-        link: "https://www.tableau.com/learn/certification/desktop-specialist",
-        level: "Specialist"
+        name: "AWS Certified Machine Learning - Specialty",
+        provider: "Amazon Web Services",
+        link: "https://aws.amazon.com/certification/certified-machine-learning-specialty/",
+        level: "Specialty"
       }
     ],
     courses: [
       {
-        name: "IBM Data Science Professional Certificate",
-        provider: "IBM/Coursera",
-        duration: "6-12 months",
-        type: "Professional Certification"
+        name: "Python for Data Science, Machine Learning & Statistical Analytics",
+        provider: "EduPlatform",
+        duration: "45 hours",
+        type: "Data Science Track",
+        courseId: "66a01b2c3d4e5f6a7b8c9d04"
       },
       {
-        name: "Microsoft Azure Data Fundamentals",
-        provider: "Microsoft",
-        duration: "2-4 weeks",
-        type: "Foundation Course"
+        name: "Deep Learning & Generative AI Masterclass: PyTorch, LLMs & Gemini",
+        provider: "EduPlatform",
+        duration: "52 hours",
+        type: "GenAI & LLMs",
+        courseId: "66a01b2c3d4e5f6a7b8c9d02"
       },
       {
-        name: "Google Analytics Academy",
-        provider: "Google",
-        duration: "Self-paced",
-        type: "Free Professional"
+        name: "AWS Certified Solutions Architect & Cloud Engineering Masterclass",
+        provider: "EduPlatform",
+        duration: "40 hours",
+        type: "Big Data & Cloud Infra",
+        courseId: "66a01b2c3d4e5f6a7b8c9d03"
       },
       {
-        name: "SAS Programming Fundamentals",
-        provider: "SAS",
-        duration: "3-6 months",
-        type: "Professional Training"
-      },
-      {
-        name: "AWS Machine Learning Specialty",
-        provider: "Amazon Web Services",
-        duration: "Self-paced",
-        type: "Cloud Training"
-      },
-      {
-        name: "Oracle Database 19c Fundamentals",
-        provider: "Oracle",
-        duration: "Self-paced",
-        type: "Free Training"
-      },
-      {
-        name: "Cisco Data Center Unified Computing",
-        provider: "Cisco",
-        duration: "3-6 months",
-        type: "Professional Training"
-      },
-      {
-        name: "Salesforce Analytics Cloud",
-        provider: "Salesforce Trailhead",
-        duration: "Self-paced",
-        type: "Free Learning"
-      },
-      {
-        name: "Red Hat Data Analytics",
-        provider: "Red Hat",
-        duration: "Various",
-        type: "Open Source Training"
-      },
-      {
-        name: "Meta Marketing Analytics",
-        provider: "Meta (Facebook)",
-        duration: "4-6 months",
-        type: "Professional Certificate"
-      },
-      {
-        name: "GitHub Advanced Security",
-        provider: "GitHub",
-        duration: "Self-paced",
-        type: "Free Training"
-      },
-      {
-        name: "HubSpot Analytics Academy",
-        provider: "HubSpot",
-        duration: "Self-paced",
-        type: "Free Certification"
+        name: "Full-Stack Web Development Bootcamp 2026: React 19 & Next.js 15",
+        provider: "EduPlatform",
+        duration: "48 hours",
+        type: "Data Apps & Dashboards",
+        courseId: "66a01b2c3d4e5f6a7b8c9d01"
       }
     ],
     jobs: [
       "Data Scientist",
-      "Data Analyst",
-      "Business Analyst",
       "Machine Learning Engineer",
-      "Research Scientist",
-      "Statistician",
-      "Business Intelligence Analyst",
+      "AI Research Engineer",
+      "Data Analyst",
+      "BI Architect",
       "Quantitative Analyst"
     ],
     icon: FaChartLine,
     color: "green"
   },
   education: {
-    title: "Education & Training",
-    description: "You have a natural talent for teaching and helping others learn!",
-    suggestedRole: "Online Instructor",
-    industry: "Education Technology",
+    title: "Education & Technical Instructional Leadership",
+    description: "You have a natural talent for synthesizing complex concepts, mentoring peers, and designing transformative curriculum!",
+    suggestedRole: "Lead Technical Instructor / Curriculum Architect",
+    industry: "Education Technology & Developer Relations",
     certifications: [
       {
         name: "Google for Education Certified Trainer",
@@ -582,120 +414,55 @@ const careerRecommendations = {
       {
         name: "Microsoft Certified Educator",
         provider: "Microsoft",
-        link: "https://docs.microsoft.com/en-us/learn/certifications/microsoft-certified-educator/",
+        link: "https://learn.microsoft.com/en-us/credentials/certifications/microsoft-certified-educator/",
         level: "Educator"
-      },
-      {
-        name: "Adobe Certified Instructor",
-        provider: "Adobe",
-        link: "https://www.adobe.com/training/instructor-led-training.html",
-        level: "Instructor"
-      },
-      {
-        name: "Coursera Teaching Online Certificate",
-        provider: "Coursera",
-        link: "https://www.coursera.org/learn/teach-online",
-        level: "Teaching"
-      },
-      {
-        name: "EdX Course Creator Certificate",
-        provider: "edX",
-        link: "https://www.edx.org/course/creating-an-online-course",
-        level: "Creator"
       }
     ],
     courses: [
       {
-        name: "Google for Education Fundamentals",
-        provider: "Google",
-        duration: "4-8 weeks",
-        type: "Free Professional"
+        name: "Tech Product Management & Agile Leadership for Engineers",
+        provider: "EduPlatform",
+        duration: "25 hours",
+        type: "Leadership Track",
+        courseId: "66a01b2c3d4e5f6a7b8c9d08"
       },
       {
-        name: "Microsoft Educator Community",
-        provider: "Microsoft",
-        duration: "Self-paced",
-        type: "Professional Development"
+        name: "Full-Stack Web Development Bootcamp 2026: React 19, Node.js & Next.js 15",
+        provider: "EduPlatform",
+        duration: "48 hours",
+        type: "Core Tech Literacy",
+        courseId: "66a01b2c3d4e5f6a7b8c9d01"
       },
       {
-        name: "Instructional Design Masterclass",
-        provider: "Various Providers",
-        duration: "8-12 weeks",
-        type: "Specialized Training"
+        name: "Modern UI/UX Design System & Product Architecture with Figma",
+        provider: "EduPlatform",
+        duration: "28 hours",
+        type: "Visual Pedagogy",
+        courseId: "66a01b2c3d4e5f6a7b8c9d05"
       },
       {
-        name: "Online Teaching Certification",
-        provider: "University Partners",
-        duration: "3-6 months",
-        type: "Academic Certificate"
-      },
-      {
-        name: "IBM SkillsBuild Educator Resources",
-        provider: "IBM",
-        duration: "Self-paced",
-        type: "Free Training"
-      },
-      {
-        name: "Cisco Networking Academy Instructor Training",
-        provider: "Cisco",
-        duration: "3-6 months",
-        type: "Professional Training"
-      },
-      {
-        name: "Oracle Academy Teaching Resources",
-        provider: "Oracle",
-        duration: "Self-paced",
-        type: "Free Educational"
-      },
-      {
-        name: "AWS Educate Program",
-        provider: "Amazon Web Services",
-        duration: "Self-paced",
-        type: "Cloud Education"
-      },
-      {
-        name: "Salesforce for Education",
-        provider: "Salesforce",
-        duration: "Self-paced",
-        type: "Free Platform Training"
-      },
-      {
-        name: "Meta Education Programs",
-        provider: "Meta (Facebook)",
-        duration: "Various",
-        type: "Digital Literacy"
-      },
-      {
-        name: "HubSpot Academy for Educators",
-        provider: "HubSpot",
-        duration: "Self-paced",
-        type: "Free Certification"
-      },
-      {
-        name: "Adobe Creative Educator Level",
-        provider: "Adobe",
-        duration: "Self-paced",
-        type: "Teaching Certification"
+        name: "Python for Data Science, Machine Learning & Statistical Analytics",
+        provider: "EduPlatform",
+        duration: "45 hours",
+        type: "STEM Curriculum",
+        courseId: "66a01b2c3d4e5f6a7b8c9d04"
       }
     ],
     jobs: [
-      "Online Instructor",
-      "Instructional Designer",
-      "Training Specialist",
-      "Educational Consultant",
-      "Learning Experience Designer",
-      "Corporate Trainer",
-      "Curriculum Developer",
-      "EdTech Specialist"
+      "Technical Curriculum Architect",
+      "Developer Advocate / DevRel",
+      "Corporate Engineering Trainer",
+      "Online Bootcamp Instructor",
+      "EdTech Product Strategist"
     ],
     icon: FaGraduationCap,
     color: "indigo"
   },
   business: {
-    title: "Business & Management",
-    description: "You have strong leadership and business acumen!",
-    suggestedRole: "Project Manager",
-    industry: "Business & Consulting",
+    title: "Business Leadership & Technical Product Management",
+    description: "You possess executive decision-making skills, business acumen, and the strategic vision to guide cross-functional software teams!",
+    suggestedRole: "Tech Product Manager / Agile Lead",
+    industry: "Tech Product Management & Strategy",
     certifications: [
       {
         name: "Project Management Professional (PMP)",
@@ -704,113 +471,54 @@ const careerRecommendations = {
         level: "Professional"
       },
       {
-        name: "Google Project Management Certificate",
+        name: "Google Project Management Professional Certificate",
         provider: "Google",
         link: "https://www.coursera.org/professional-certificates/google-project-management",
         level: "Professional"
       },
       {
-        name: "Microsoft Office Specialist",
-        provider: "Microsoft",
-        link: "https://www.microsoft.com/en-us/learning/mos-certification.aspx",
-        level: "Specialist"
-      },
-      {
-        name: "Salesforce Administrator",
-        provider: "Salesforce",
-        link: "https://trailhead.salesforce.com/credentials/administrator",
-        level: "Administrator"
-      },
-      {
-        name: "HubSpot Inbound Marketing",
-        provider: "HubSpot",
-        link: "https://academy.hubspot.com/courses/inbound-marketing",
-        level: "Marketing"
+        name: "AWS Certified Cloud Practitioner",
+        provider: "Amazon Web Services",
+        link: "https://aws.amazon.com/certification/certified-cloud-practitioner/",
+        level: "Foundational"
       }
     ],
     courses: [
       {
-        name: "Google Project Management Professional",
-        provider: "Google/Coursera",
-        duration: "3-6 months",
-        type: "Professional Certificate"
+        name: "Tech Product Management & Agile Leadership for Engineers",
+        provider: "EduPlatform",
+        duration: "25 hours",
+        type: "Product & Strategy Track",
+        courseId: "66a01b2c3d4e5f6a7b8c9d08"
       },
       {
-        name: "Microsoft Business Applications",
-        provider: "Microsoft",
-        duration: "2-4 months",
-        type: "Business Training"
+        name: "AWS Certified Solutions Architect & Cloud Engineering Masterclass",
+        provider: "EduPlatform",
+        duration: "40 hours",
+        type: "Enterprise Cloud Strategy",
+        courseId: "66a01b2c3d4e5f6a7b8c9d03"
       },
       {
-        name: "Salesforce Trailhead",
-        provider: "Salesforce",
-        duration: "Self-paced",
-        type: "Professional Platform"
+        name: "Full-Stack Web Development Bootcamp 2026: React 19, Node.js & Next.js 15",
+        provider: "EduPlatform",
+        duration: "48 hours",
+        type: "Software Delivery",
+        courseId: "66a01b2c3d4e5f6a7b8c9d01"
       },
       {
-        name: "MBA Essentials",
-        provider: "Various Universities",
-        duration: "6-12 months",
-        type: "Executive Education"
-      },
-      {
-        name: "IBM Business Analytics",
-        provider: "IBM",
-        duration: "4-6 months",
-        type: "Professional Training"
-      },
-      {
-        name: "Oracle Business Intelligence",
-        provider: "Oracle",
-        duration: "Self-paced",
-        type: "Free Training"
-      },
-      {
-        name: "Cisco Sales Training",
-        provider: "Cisco",
-        duration: "3-6 months",
-        type: "Professional Development"
-      },
-      {
-        name: "AWS Business Professional",
-        provider: "Amazon Web Services",
-        duration: "Self-paced",
-        type: "Cloud Business"
-      },
-      {
-        name: "Meta Marketing Science",
-        provider: "Meta (Facebook)",
-        duration: "6-8 weeks",
-        type: "Marketing Certification"
-      },
-      {
-        name: "HubSpot Academy Complete",
-        provider: "HubSpot",
-        duration: "Self-paced",
-        type: "Free All-in-One"
-      },
-      {
-        name: "Red Hat Business Value",
-        provider: "Red Hat",
-        duration: "Various",
-        type: "Open Source Business"
-      },
-      {
-        name: "GitHub for Teams",
-        provider: "GitHub",
-        duration: "Self-paced",
-        type: "Free Collaboration"
+        name: "Python for Data Science, Machine Learning & Statistical Analytics",
+        provider: "EduPlatform",
+        duration: "45 hours",
+        type: "Data-Driven Decisions",
+        courseId: "66a01b2c3d4e5f6a7b8c9d04"
       }
     ],
     jobs: [
-      "Project Manager",
-      "Business Analyst",
-      "Digital Marketing Manager",
       "Product Manager",
-      "Entrepreneur",
-      "Management Consultant",
-      "Operations Manager",
-      "Business Development Manager"
+      "Scrum Master / Agile Coach",
+      "Technology Consultant",
+      "Operations Director",
+      "Startup Founder / Entrepreneur"
     ],
     icon: FaBriefcase,
     color: "amber"
@@ -2262,19 +1970,61 @@ const CareerAssessment = ({ onClose }) => {
 
               <div className="grid md:grid-cols-2 gap-4">
                 {recommendation.courses.map((course, index) => (
-                  <div key={index} className="bg-gradient-to-br from-slate-50 to-indigo-50/40 rounded-xl p-4 border border-slate-200/80">
-                    <h5 className="font-bold text-slate-900 text-sm mb-1.5">{course.name}</h5>
-                    <div className="flex flex-wrap gap-2 text-[11px] text-slate-600">
-                      <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200">
-                        Provider: {course.provider}
-                      </span>
-                      <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200">
-                        Duration: {course.duration}
-                      </span>
-                      <span className="bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded-md">
-                        {course.type}
-                      </span>
+                  <div
+                    key={index}
+                    className="bg-gradient-to-br from-slate-50 to-indigo-50/40 rounded-2xl p-5 border border-slate-200/80 hover:border-indigo-300 hover:shadow-md transition flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h5 className="font-bold text-slate-900 text-sm leading-snug">
+                          {course.name}
+                        </h5>
+                        {course.courseId && (
+                          <span className="bg-indigo-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full shrink-0 shadow-xs">
+                            EduPlatform
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-[11px] text-slate-600 mb-3">
+                        <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200 font-medium">
+                          Provider: <strong className="text-slate-800 font-semibold">{course.provider}</strong>
+                        </span>
+                        <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200 font-medium">
+                          Duration: <strong className="text-slate-800 font-semibold">{course.duration}</strong>
+                        </span>
+                        <span className="bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded-md">
+                          {course.type}
+                        </span>
+                      </div>
                     </div>
+
+                    {course.courseId ? (
+                      <Link
+                        to={`/courses/${course.courseId}`}
+                        className="mt-3 w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs"
+                      >
+                        <span>View Course & Syllabus</span>
+                        <FaArrowRight className="text-[10px]" />
+                      </Link>
+                    ) : course.link ? (
+                      <a
+                        href={course.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2"
+                      >
+                        <span>Explore Program</span>
+                        <FaExternalLinkAlt className="text-[10px]" />
+                      </a>
+                    ) : (
+                      <Link
+                        to="/courses"
+                        className="mt-3 w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2"
+                      >
+                        <span>Explore Courses</span>
+                        <FaArrowRight className="text-[10px]" />
+                      </Link>
+                    )}
                   </div>
                 ))}
               </div>

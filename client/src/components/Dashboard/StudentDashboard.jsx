@@ -132,85 +132,85 @@ const StudentDashboard = ({ user }) => {
 
   const inProgressCourses = [
     {
-      id: "course-1",
-      title: "Advanced React Development: Next.js 14 & TypeScript",
-      category: "Frontend Architecture",
+      id: "66a01b2c3d4e5f6a7b8c9d01",
+      title: "Full-Stack Web Development Bootcamp 2026: React 19, Node.js & Next.js 15",
+      category: "Web Development",
       progress: 78,
-      instructor: "Dr. Angela Yu",
-      nextLesson: "Custom Hooks & Memory Profiling",
+      instructor: "Dr. Angela Yu & Brad Traversy",
+      nextLesson: "React 19 Hooks & Server Actions",
       timeLeft: "2h 30m remaining",
       thumbnail:
-        "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80",
       accentColor: "from-violet-600 to-indigo-600",
-      pillColor: "text-violet-400 bg-violet-500/10 border-violet-500/20",
+      pillColor: "text-violet-700 bg-violet-50 border-violet-200",
     },
     {
-      id: "course-2",
-      title: "Node.js Backend Architecture & Microservices",
-      category: "Backend Systems",
+      id: "66a01b2c3d4e5f6a7b8c9d03",
+      title: "AWS Certified Solutions Architect & Cloud Engineering Masterclass",
+      category: "Cloud Computing",
       progress: 45,
-      instructor: "Brad Traversy",
-      nextLesson: "Redis Caching & API Rate Limiting",
+      instructor: "Stephane Maarek",
+      nextLesson: "Virtual Private Cloud (VPC) & Subnet Peering",
       timeLeft: "1h 45m remaining",
       thumbnail:
-        "https://images.unsplash.com/photo-1627398242454-45a1465c2479?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
       accentColor: "from-cyan-500 to-blue-600",
-      pillColor: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+      pillColor: "text-cyan-700 bg-cyan-50 border-cyan-200",
     },
     {
-      id: "course-3",
-      title: "Full-Stack Data Engineering & PostgreSQL Mastery",
-      category: "Data & Cloud",
+      id: "66a01b2c3d4e5f6a7b8c9d04",
+      title: "Python for Data Science, Machine Learning & Statistical Analytics",
+      category: "Data Science",
       progress: 24,
       instructor: "Jose Portilla",
-      nextLesson: "Partitioning & Complex Analytical Queries",
+      nextLesson: "Pandas DataFrames & Statistical Distributions",
       timeLeft: "3h 15m remaining",
       thumbnail:
-        "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80",
       accentColor: "from-emerald-500 to-teal-600",
-      pillColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+      pillColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
     },
   ];
 
   const completedCourses = [
     {
-      id: "course-comp-1",
-      title: "Modern JavaScript (ES2024) Deep Dive & Async Patterns",
-      category: "Core Web",
+      id: "66a01b2c3d4e5f6a7b8c9d06",
+      title: "Cybersecurity Defense & Ethical Hacking: Zero to Hero",
+      category: "Cybersecurity",
       completedDate: "August 18, 2026",
-      credentialId: "EDU-892410-JS",
+      credentialId: "EDU-892410-SEC",
       thumbnail:
-        "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80",
     },
     {
-      id: "course-comp-2",
-      title: "Tailwind CSS & Modern Responsive Design Systems",
-      category: "Design Engineering",
+      id: "66a01b2c3d4e5f6a7b8c9d05",
+      title: "Modern UI/UX Design System & Product Architecture with Figma",
+      category: "Design & UI/UX",
       completedDate: "August 02, 2026",
-      credentialId: "EDU-771923-CSS",
+      credentialId: "EDU-771923-FIG",
       thumbnail:
-        "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=600&q=80",
     },
   ];
 
   const recommendedCourses = [
     {
-      id: "rec-1",
-      title: "Generative AI Engineering: LLM Pipelines & Vector DBs",
-      category: "AI & ML",
+      id: "66a01b2c3d4e5f6a7b8c9d02",
+      title: "Deep Learning & Generative AI Masterclass: PyTorch, LLMs & Gemini",
+      category: "AI & Machine Learning",
       matchScore: 98,
-      duration: "18h total",
+      duration: "52 hours",
       thumbnail:
         "https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=600&q=80",
     },
     {
-      id: "rec-2",
-      title: "AWS Certified Solutions Architect & DevOps Pipelines",
-      category: "Cloud Engineering",
+      id: "66a01b2c3d4e5f6a7b8c9d07",
+      title: "Cross-Platform Mobile Development with Flutter & Dart 3",
+      category: "Mobile Development",
       matchScore: 94,
-      duration: "26h total",
+      duration: "32 hours",
       thumbnail:
-        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80",
     },
   ];
 
@@ -696,7 +696,7 @@ const StudentDashboard = ({ user }) => {
                         </div>
 
                         <Link
-                          to="/courses"
+                          to={`/courses/${c.id}/learn`}
                           className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                         >
                           <FaPlay className="text-[10px]" />
@@ -735,10 +735,13 @@ const StudentDashboard = ({ user }) => {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <button className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold hover:bg-emerald-100 transition flex items-center gap-1.5">
+                        <Link
+                          to={`/courses/${c.id}`}
+                          className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold hover:bg-emerald-100 transition flex items-center gap-1.5"
+                        >
                           <FaCheckCircle />
-                          <span>View Certificate</span>
-                        </button>
+                          <span>Review Course</span>
+                        </Link>
                       </div>
                     </div>
                   ))}
@@ -774,7 +777,7 @@ const StudentDashboard = ({ user }) => {
                       </div>
 
                       <Link
-                        to="/courses"
+                        to={`/courses/${c.id}`}
                         className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                       >
                         <span>Explore</span>

@@ -23,6 +23,7 @@ import {
 import { getAllCoursesAPI } from "../../reactQuery/courses/coursesAPI";
 import { BASE_URL } from "../../utils/utils";
 import AlertMessage from "../Alert/AlertMessage";
+import { REAL_COURSES } from "../../data/realCourses";
 
 const CATEGORIES = [
   "Web Development",
@@ -86,9 +87,9 @@ const CourseCard = ({ course, isRecommended = false, onEnroll, currentUser, view
   const rating = course?.rating || 4.8;
   const reviewsCount = course?.reviewsCount || (course?.students?.length ? course.students.length * 7 + 42 : 180);
   const hours = course?.estimatedHours || 24;
-  const lectures = course?.sections?.length || course?.modules?.length || 16;
-  const instructorName = course?.user?.username || "EduPlatform Expert";
-  const thumbnail = course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80";
+  const lectures = course?.lectures || course?.sections?.length || course?.modules?.length || 16;
+  const instructorName = course?.instructor || course?.user?.username || "EduPlatform Expert";
+  const thumbnail = course?.thumbnail?.url || (typeof course?.thumbnail === 'string' ? course?.thumbnail : "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80");
 
   if (viewMode === "list") {
     return (
@@ -373,9 +374,11 @@ export default function Courses() {
 
   // Filter & Sort computation
   const filteredCourses = useMemo(() => {
-    if (!coursesData || !Array.isArray(coursesData)) return [];
+    const rawCourses = coursesData && Array.isArray(coursesData) && coursesData.length > 0
+      ? coursesData
+      : REAL_COURSES;
 
-    let result = [...coursesData];
+    let result = [...rawCourses];
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
