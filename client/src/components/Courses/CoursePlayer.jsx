@@ -30,6 +30,9 @@ import {
   FaCopy,
   FaTrashAlt,
   FaMagic,
+  FaClipboardCheck,
+  FaRedo,
+  FaBolt,
 } from "react-icons/fa";
 import { getCourseById } from "../../services/courseService";
 import AlertMessage from "../Alert/AlertMessage";
@@ -231,6 +234,242 @@ const CopilotMessageBody = ({ content, onCopyCode, copiedCodeId }) => {
   );
 };
 
+// Dynamic Knowledge-Check Quiz Generator
+const getModuleQuiz = (courseTitle = "", category = "", moduleTitle = "", moduleIndex = 0) => {
+  const cTitle = (courseTitle || "").toLowerCase();
+  const cat = (category || "").toLowerCase();
+
+  if (
+    cTitle.includes("react") ||
+    cTitle.includes("frontend") ||
+    cTitle.includes("web") ||
+    cat.includes("web") ||
+    cat.includes("development")
+  ) {
+    return [
+      {
+        id: `q-${moduleIndex}-1`,
+        question: "In modern frontend architecture, what is the primary benefit of unidirectional data flow?",
+        options: [
+          "It allows child components to directly mutate parent application state",
+          "It ensures predictable state changes by letting data flow down and events bubble up",
+          "It eliminates the need for HTTP APIs and databases",
+          "It automatically minifies all CSS files during development",
+        ],
+        correctIndex: 1,
+        explanation: "Unidirectional data flow ensures a single source of truth. State flows downward via props, while user events bubble up via callbacks, preventing hidden state mutations and hard-to-track bugs.",
+      },
+      {
+        id: `q-${moduleIndex}-2`,
+        question: "When is it appropriate to use `useMemo` or `useCallback` in React?",
+        options: [
+          "On every single internal helper function and variable without exception",
+          "Only when optimizing expensive computations or stabilizing referential equality for dependency arrays",
+          "To trigger browser page reloads",
+          "To encrypt client-side cookies",
+        ],
+        correctIndex: 1,
+        explanation: "Premature memoization introduces memory overhead and complexity. Only use `useMemo` or `useCallback` when computations are measurably heavy or when function identities prevent re-renders in memoized children.",
+      },
+      {
+        id: `q-${moduleIndex}-3`,
+        question: "Which HTTP method should be used for operations that must be idempotent (repeated without side-effects)?",
+        options: [
+          "POST",
+          "PUT / GET",
+          "PATCH only",
+          "CONNECT",
+        ],
+        correctIndex: 1,
+        explanation: "GET and PUT requests are idempotent: making the same request multiple times produces the exact same server state, unlike POST which typically creates a new record every execution.",
+      },
+      {
+        id: `q-${moduleIndex}-4`,
+        question: "What is the primary benefit of component modularity and separation of concerns?",
+        options: [
+          "It isolates logic into testable units and allows teams to scale without stepping on each other's code",
+          "It causes bundle sizes to double",
+          "It forces all state to be global",
+          "It disables client-side routing",
+        ],
+        correctIndex: 0,
+        explanation: "Modular components are easy to test in isolation, reuse across different pages, and maintain without ripple effects throughout the rest of the application.",
+      },
+    ];
+  }
+
+  if (
+    cTitle.includes("python") ||
+    cTitle.includes("data") ||
+    cTitle.includes("machine") ||
+    cTitle.includes("ai") ||
+    cat.includes("data") ||
+    cat.includes("ai")
+  ) {
+    return [
+      {
+        id: `q-${moduleIndex}-1`,
+        question: "Which Python data structure is immutable and hashable, making it suitable as a dictionary key?",
+        options: [
+          "List [1, 2, 3]",
+          "Tuple (1, 2, 3)",
+          "Set {1, 2, 3}",
+          "Dictionary {'k': 'v'}",
+        ],
+        correctIndex: 1,
+        explanation: "Tuples cannot be altered once created (immutable), which ensures their hash value remains constant throughout execution, qualifying them as valid dictionary keys.",
+      },
+      {
+        id: `q-${moduleIndex}-2`,
+        question: "Why is vectorized computation in NumPy significantly faster than standard Python `for` loops?",
+        options: [
+          "It executes operations in highly optimized, pre-compiled C-level loops with continuous memory buffers",
+          "It skips data validation and assumes all numbers are zero",
+          "It offloads computation to external cloud servers automatically",
+          "It compresses the data into zip files before math",
+        ],
+        correctIndex: 0,
+        explanation: "NumPy arrays use contiguous memory blocks and vectorized operations written in C, bypassing Python interpreter overhead and type-checking loops.",
+      },
+      {
+        id: `q-${moduleIndex}-3`,
+        question: "When dealing with severe class imbalance in classification, which evaluation metric is preferred over raw Accuracy?",
+        options: [
+          "Raw Accuracy",
+          "F1-Score and Precision-Recall AUC",
+          "Number of training iterations only",
+          "CPU core count",
+        ],
+        correctIndex: 1,
+        explanation: "A naive model predicting 'negative' 100% of the time achieves 99% accuracy but fails entirely. Precision-Recall AUC and F1-score measure how well minority positive cases are actually identified.",
+      },
+      {
+        id: `q-${moduleIndex}-4`,
+        question: "What is the primary goal of k-fold cross-validation?",
+        options: [
+          "To test model generalization across multiple splits and prevent overfitting to a single test sample",
+          "To encrypt model weights",
+          "To speed up GPU cooling",
+          "To format CSV tables into HTML",
+        ],
+        correctIndex: 0,
+        explanation: "K-fold cross validation trains and evaluates models across k distinct partitions, ensuring the reported performance isn't an artifact of a lucky test split.",
+      },
+    ];
+  }
+
+  if (
+    cTitle.includes("cloud") ||
+    cTitle.includes("devops") ||
+    cTitle.includes("docker") ||
+    cTitle.includes("aws") ||
+    cat.includes("cloud")
+  ) {
+    return [
+      {
+        id: `q-${moduleIndex}-1`,
+        question: "What is the architectural distinction between a container and a traditional virtual machine?",
+        options: [
+          "Containers share the host operating system kernel and isolate user-space, making them lightweight",
+          "Containers require dedicated hypervisors and full guest OS installations",
+          "Containers cannot run web servers",
+          "Virtual machines do not use memory",
+        ],
+        correctIndex: 0,
+        explanation: "Containers share the host kernel while isolating processes via namespaces and cgroups, allowing sub-second startups and minimal resource overhead compared to heavy hypervisor VMs.",
+      },
+      {
+        id: `q-${moduleIndex}-2`,
+        question: "What is the core principle behind 'Infrastructure as Code' (IaC)?",
+        options: [
+          "Manually clicking configuration buttons in web consoles",
+          "Declaring, version-controlling, and provisioning environments via reproducible code definitions",
+          "Only running apps on local developer laptops",
+          "Never documenting server topologies",
+        ],
+        correctIndex: 1,
+        explanation: "IaC enables deterministic, auditable, and automated infrastructure deployments using tools like Terraform or CloudFormation.",
+      },
+      {
+        id: `q-${moduleIndex}-3`,
+        question: "In Kubernetes, which controller is responsible for maintaining a declared number of identical pod replicas?",
+        options: [
+          "Deployment (backed by ReplicaSet)",
+          "ConfigMap",
+          "Ingress Controller",
+          "PersistentVolumeClaim",
+        ],
+        correctIndex: 0,
+        explanation: "A Kubernetes Deployment manages ReplicaSets to ensure the active pod count matches your desired replica target, automatically restarting failed pods.",
+      },
+      {
+        id: `q-${moduleIndex}-4`,
+        question: "What is the main goal of automated canary deployments in modern CD pipelines?",
+        options: [
+          "Routing a small fraction of real production traffic to the new release to detect errors before full rollout",
+          "Stopping all servers for 2 hours during an upgrade",
+          "Deleting database indexes",
+          "Randomly rebooting clusters",
+        ],
+        correctIndex: 0,
+        explanation: "Canary deployments roll out new code to a small cohort (e.g. 5%), monitoring error rates and telemetry before promoting to 100% of users.",
+      },
+    ];
+  }
+
+  // Default / Engineering & Architecture Module Quiz
+  return [
+    {
+      id: `q-${moduleIndex}-1`,
+      question: `What is the primary architectural takeaway emphasized in "${moduleTitle || 'this module'}"?`,
+      options: [
+        "Building modular, decoupled components with explicit interfaces and error boundaries",
+        "Writing monolithic 5,000-line files to avoid importing files",
+        "Disabling all logging and error monitoring",
+        "Ignoring asynchronous state changes",
+      ],
+      correctIndex: 0,
+      explanation: "Decoupling system concerns and wrapping operations in explicit error boundaries ensures systems remain resilient, testable, and scalable over time.",
+    },
+    {
+      id: `q-${moduleIndex}-2`,
+      question: "Why should critical user workflows always include defensive error handling?",
+      options: [
+        "To prevent unexpected network failures or corrupted payloads from crashing the client application",
+        "Because it makes the code run in slow motion",
+        "It is required by the browser vendor for monetization",
+        "It hides all bugs permanently from developers",
+      ],
+      correctIndex: 0,
+      explanation: "Defensive error handling (try/catch blocks, fallback UI, retry logic) gracefully handles real-world connectivity hiccups without degrading user trust.",
+    },
+    {
+      id: `q-${moduleIndex}-3`,
+      question: "What is the primary purpose of persistent state synchronization (e.g. localStorage / backend APIs)?",
+      options: [
+        "Ensuring the learner's progress, notes, and milestones persist across browser refreshes and sessions",
+        "Slowing down the page render time",
+        "Forcing the user to re-enter their credentials on every page",
+        "Disabling cache memory",
+      ],
+      correctIndex: 0,
+      explanation: "State persistence gives users continuity. Refreshing the browser or switching tabs doesn't destroy the learner's progress or notes.",
+    },
+    {
+      id: `q-${moduleIndex}-4`,
+      question: "What is the most effective way to validate retention of these concepts?",
+      options: [
+        "Building a functional project and passing hands-on module knowledge checks",
+        "Only reading the titles of the lessons",
+        "Skipping all practical exercises",
+        "Closing the browser immediately",
+      ],
+      correctIndex: 0,
+      explanation: "Active recall through immediate testing and hands-on coding reinforces neural pathways and delivers genuine comprehension.",
+    },
+  ];
+};
+
 export default function CoursePlayer() {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -273,6 +512,26 @@ export default function CoursePlayer() {
   const [copiedCodeId, setCopiedCodeId] = useState(null);
   const copilotChatEndRef = useRef(null);
 
+  // Quiz & XP Gamification State
+  const [quizAnswers, setQuizAnswers] = useState({});
+  const [isQuizSubmitted, setIsQuizSubmitted] = useState(false);
+  const [quizHistory, setQuizHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`edu_quiz_${courseId}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [courseXP, setCourseXP] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`edu_xp_${courseId}`);
+      return saved ? parseInt(saved, 10) : 0;
+    } catch {
+      return 0;
+    }
+  });
+
   useEffect(() => {
     try {
       localStorage.setItem(`edu_progress_${courseId}`, JSON.stringify(progress));
@@ -288,6 +547,31 @@ export default function CoursePlayer() {
       // ignore
     }
   }, [courseId, savedNotes]);
+
+  // Save Quiz History & XP
+  useEffect(() => {
+    try {
+      localStorage.setItem(`edu_quiz_${courseId}`, JSON.stringify(quizHistory));
+    } catch {
+      // ignore
+    }
+  }, [courseId, quizHistory]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(`edu_xp_${courseId}`, courseXP.toString());
+    } catch {
+      // ignore
+    }
+  }, [courseId, courseXP]);
+
+  // Reset quiz answers when module switches if not submitted
+  useEffect(() => {
+    if (!quizHistory[currentModuleIndex]?.passed) {
+      setQuizAnswers({});
+      setIsQuizSubmitted(false);
+    }
+  }, [currentModuleIndex, quizHistory]);
 
   // Auto-scroll copilot messages
   useEffect(() => {
@@ -529,6 +813,61 @@ export default function CoursePlayer() {
     ]);
   };
 
+  // Module Quiz Logic
+  const currentQuizQuestions = useMemo(() => {
+    return getModuleQuiz(
+      course?.title,
+      course?.category,
+      currentModule?.title,
+      currentModuleIndex
+    );
+  }, [course?.title, course?.category, currentModule?.title, currentModuleIndex]);
+
+  const handleSelectQuizOption = (questionId, optionIndex) => {
+    if (isQuizSubmitted) return;
+    setQuizAnswers((prev) => ({
+      ...prev,
+      [questionId]: optionIndex,
+    }));
+  };
+
+  const handleSubmitQuiz = () => {
+    if (Object.keys(quizAnswers).length < currentQuizQuestions.length) return;
+
+    let correctCount = 0;
+    currentQuizQuestions.forEach((q) => {
+      if (quizAnswers[q.id] === q.correctIndex) {
+        correctCount += 1;
+      }
+    });
+
+    const percent = Math.round((correctCount / currentQuizQuestions.length) * 100);
+    const passed = percent >= 75;
+
+    setIsQuizSubmitted(true);
+
+    const prevPassed = quizHistory[currentModuleIndex]?.passed;
+    if (passed && !prevPassed) {
+      setCourseXP((prev) => prev + 150);
+    }
+
+    setQuizHistory((prev) => ({
+      ...prev,
+      [currentModuleIndex]: {
+        passed,
+        score: correctCount,
+        total: currentQuizQuestions.length,
+        percentage: percent,
+        date: new Date().toLocaleDateString(),
+      },
+    }));
+  };
+
+  const handleRetakeQuiz = () => {
+    setQuizAnswers({});
+    setIsQuizSubmitted(false);
+  };
+
   if (isLoading && !fallbackCourse) {
     return (
       <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
@@ -573,6 +912,12 @@ export default function CoursePlayer() {
 
         {/* Progress, Leaderboard, Certificate & Sidebar Toggle */}
         <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+          {/* Gamification XP Badge */}
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-black shadow-2xs">
+            <FaBolt className="text-amber-500 text-xs animate-pulse" />
+            <span>{courseXP} XP</span>
+          </div>
+
           <Link
             to={`/students-position/${courseId}`}
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-bold transition shadow-xs"
@@ -677,10 +1022,19 @@ export default function CoursePlayer() {
             {/* UDEMY / COURSERA TABBED CONTENT BAR */}
             <div className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
               {/* Tab Header Navigation */}
-              <div className="flex items-center border-b border-slate-200 px-4 sm:px-6 bg-slate-50/80 gap-6">
+              <div className="flex items-center border-b border-slate-200 px-4 sm:px-6 bg-slate-50/80 gap-4 sm:gap-6 overflow-x-auto">
                 {[
                   { id: "overview", label: "Overview", icon: <FaBookOpen /> },
                   { id: "copilot", label: "AI Copilot", icon: <FaRobot />, badge: "AI" },
+                  {
+                    id: "quiz",
+                    label: "Module Quiz",
+                    icon: <FaClipboardCheck />,
+                    badge: quizHistory[currentModuleIndex]?.passed ? "Passed" : "Quiz",
+                    badgeColor: quizHistory[currentModuleIndex]?.passed
+                      ? "bg-emerald-600 text-white"
+                      : "bg-indigo-100 text-indigo-700",
+                  },
                   { id: "resources", label: "Resources & Files", icon: <FaFolderOpen /> },
                   { id: "notes", label: "Notes", icon: <FaStickyNote /> },
                   { id: "qa", label: "Q&A Forum", icon: <FaQuestionCircle /> },
@@ -688,7 +1042,7 @@ export default function CoursePlayer() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`py-4 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition relative ${
+                    className={`py-4 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition whitespace-nowrap relative ${
                       activeTab === tab.id
                         ? "border-indigo-600 text-indigo-600"
                         : "border-transparent text-slate-500 hover:text-slate-800"
@@ -697,7 +1051,11 @@ export default function CoursePlayer() {
                     <span>{tab.icon}</span>
                     <span>{tab.label}</span>
                     {tab.badge && (
-                      <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase shadow-xs">
+                      <span
+                        className={`text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase shadow-xs ${
+                          tab.badgeColor || "bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                        }`}
+                      >
                         {tab.badge}
                       </span>
                     )}
@@ -884,6 +1242,251 @@ export default function CoursePlayer() {
                   </div>
                 )}
 
+                {/* ─── MODULE KNOWLEDGE-CHECK QUIZ TAB ───────────────────── */}
+                {activeTab === "quiz" && (
+                  <div className="space-y-6">
+                    {/* Quiz Billboard */}
+                    <div className="p-6 bg-gradient-to-r from-indigo-50 via-slate-50 to-white rounded-2xl border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+                      <div>
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-600">
+                          <FaClipboardCheck />
+                          <span>Knowledge Check &bull; Module {currentModuleIndex + 1}</span>
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 mt-1">
+                          {currentModule?.title || "Module Assessment"}
+                        </h3>
+                        <p className="text-slate-600 text-xs mt-1">
+                          Answer all {currentQuizQuestions.length} questions. Score 75% or higher to earn +150 XP and mark this module verified.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-center shadow-2xs">
+                          <span className="text-[10px] uppercase font-bold text-slate-400">Award</span>
+                          <div className="text-sm font-black text-amber-600 flex items-center justify-center gap-1">
+                            <FaBolt className="text-amber-500 text-xs" />
+                            <span>+150 XP</span>
+                          </div>
+                        </div>
+
+                        {quizHistory[currentModuleIndex]?.passed && (
+                          <div className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center shadow-2xs">
+                            <span className="text-[10px] uppercase font-bold text-emerald-600">Status</span>
+                            <div className="text-sm font-black text-emerald-700 flex items-center justify-center gap-1">
+                              <FaCheckCircle className="text-emerald-600 text-xs" />
+                              <span>Passed</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Completion Alert Banner */}
+                    {isQuizSubmitted && (
+                      <div
+                        className={`p-4 rounded-2xl border flex items-center justify-between gap-3 animate-fadeIn ${
+                          quizHistory[currentModuleIndex]?.passed
+                            ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+                            : "bg-amber-50 border-amber-200 text-amber-900"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {quizHistory[currentModuleIndex]?.passed ? (
+                            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                              <FaTrophy />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                              <FaLightbulb />
+                            </div>
+                          )}
+                          <div>
+                            <h4 className="font-extrabold text-sm">
+                              {quizHistory[currentModuleIndex]?.passed
+                                ? "🎉 Outstanding! Module Knowledge-Check Passed"
+                                : "Keep going! Review and try again"}
+                            </h4>
+                            <p className="text-xs mt-0.5 opacity-90">
+                              {quizHistory[currentModuleIndex]?.passed
+                                ? `You scored ${quizHistory[currentModuleIndex].score} of ${quizHistory[currentModuleIndex].total} (${quizHistory[currentModuleIndex].percentage}%). 150 XP added to your ranking!`
+                                : `You scored ${quizHistory[currentModuleIndex]?.score || 0} of ${quizHistory[currentModuleIndex]?.total || currentQuizQuestions.length}. A score of 75% or higher is required to pass.`}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleRetakeQuiz}
+                          className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold transition shadow-xs flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
+                        >
+                          <FaRedo className="text-[10px]" />
+                          <span>Retake Quiz</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Question Cards */}
+                    <div className="space-y-6">
+                      {currentQuizQuestions.map((q, qIdx) => {
+                        const isAnswered = quizAnswers[q.id] !== undefined;
+                        const selectedOpt = quizAnswers[q.id];
+                        const isCorrectAnswer = selectedOpt === q.correctIndex;
+
+                        return (
+                          <div
+                            key={q.id}
+                            className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xs"
+                          >
+                            <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+                                Question {qIdx + 1} of {currentQuizQuestions.length}
+                              </span>
+                              {isQuizSubmitted && (
+                                <span
+                                  className={`text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                                    isCorrectAnswer
+                                      ? "bg-emerald-100 text-emerald-800"
+                                      : "bg-rose-100 text-rose-800"
+                                  }`}
+                                >
+                                  {isCorrectAnswer ? (
+                                    <>
+                                      <FaCheck className="text-[10px]" /> Correct
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FaTimes className="text-[10px]" /> Incorrect
+                                    </>
+                                  )}
+                                </span>
+                              )}
+                            </div>
+
+                            <p className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                              {q.question}
+                            </p>
+
+                            {/* Options List */}
+                            <div className="space-y-2.5">
+                              {q.options.map((opt, optIdx) => {
+                                const letters = ["A", "B", "C", "D"];
+                                const isSelected = selectedOpt === optIdx;
+                                const isRightChoice = optIdx === q.correctIndex;
+
+                                let optClasses =
+                                  "p-3.5 rounded-xl border text-xs sm:text-sm flex items-center justify-between transition cursor-pointer ";
+
+                                if (!isQuizSubmitted) {
+                                  if (isSelected) {
+                                    optClasses += "border-indigo-600 bg-indigo-50/70 text-indigo-950 font-semibold ring-1 ring-indigo-600 shadow-2xs";
+                                  } else {
+                                    optClasses += "border-slate-200 bg-slate-50/40 hover:bg-slate-50 hover:border-slate-300 text-slate-700";
+                                  }
+                                } else {
+                                  if (isRightChoice) {
+                                    optClasses += "border-emerald-500 bg-emerald-50 text-emerald-950 font-semibold";
+                                  } else if (isSelected && !isRightChoice) {
+                                    optClasses += "border-rose-500 bg-rose-50 text-rose-950 font-semibold";
+                                  } else {
+                                    optClasses += "border-slate-100 bg-slate-50/30 text-slate-400 opacity-60";
+                                  }
+                                }
+
+                                return (
+                                  <div
+                                    key={optIdx}
+                                    onClick={() => handleSelectQuizOption(q.id, optIdx)}
+                                    className={optClasses}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <span
+                                        className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 ${
+                                          !isQuizSubmitted && isSelected
+                                            ? "bg-indigo-600 text-white"
+                                            : isQuizSubmitted && isRightChoice
+                                            ? "bg-emerald-600 text-white"
+                                            : isQuizSubmitted && isSelected && !isRightChoice
+                                            ? "bg-rose-600 text-white"
+                                            : "bg-slate-200 text-slate-600"
+                                        }`}
+                                      >
+                                        {letters[optIdx]}
+                                      </span>
+                                      <span className="leading-snug">{opt}</span>
+                                    </div>
+
+                                    {isQuizSubmitted && isRightChoice && (
+                                      <FaCheck className="text-emerald-600 text-xs flex-shrink-0 ml-2" />
+                                    )}
+                                    {isQuizSubmitted && isSelected && !isRightChoice && (
+                                      <FaTimes className="text-rose-600 text-xs flex-shrink-0 ml-2" />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* Explanation Dropdown on Submit */}
+                            {isQuizSubmitted && (
+                              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-1">
+                                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                                  <FaLightbulb className="text-amber-500" />
+                                  <span>Explanation:</span>
+                                </div>
+                                <p>{q.explanation}</p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Quiz Submit Bar */}
+                    {!isQuizSubmitted ? (
+                      <div className="p-5 bg-white border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                        <div className="text-xs text-slate-500 font-medium">
+                          Answered <strong className="text-indigo-600 font-bold">{Object.keys(quizAnswers).length}</strong> of{" "}
+                          <strong className="text-slate-800">{currentQuizQuestions.length}</strong> questions
+                        </div>
+                        <button
+                          type="button"
+                          disabled={Object.keys(quizAnswers).length < currentQuizQuestions.length}
+                          onClick={handleSubmitQuiz}
+                          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-600/20 transition flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                        >
+                          <FaClipboardCheck />
+                          <span>Submit Quiz Answers</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-end gap-3">
+                        <button
+                          type="button"
+                          onClick={handleRetakeQuiz}
+                          className="px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition shadow-xs flex items-center gap-2 cursor-pointer"
+                        >
+                          <FaRedo className="text-xs" />
+                          <span>Retake Module Quiz</span>
+                        </button>
+                        {quizHistory[currentModuleIndex]?.passed && currentModuleIndex < modules.length - 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentModuleIndex(currentModuleIndex + 1);
+                              setCurrentLessonIndex(0);
+                              setActiveTab("overview");
+                            }}
+                            className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-md shadow-indigo-600/20 flex items-center gap-2 cursor-pointer"
+                          >
+                            <span>Advance to Next Module</span>
+                            <FaStepForward className="text-[10px]" />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {activeTab === "resources" && (
                   <div className="space-y-3">
                     <h3 className="text-sm font-bold text-slate-900">Lecture Downloads & References</h3>
@@ -1034,6 +1637,38 @@ export default function CoursePlayer() {
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* Module Knowledge Quiz Trigger */}
+                  <div className="p-2.5 bg-slate-50/70 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentModuleIndex(mIdx);
+                        setActiveTab("quiz");
+                      }}
+                      className={`w-full py-1.5 px-2.5 rounded-xl text-[11px] font-bold flex items-center justify-between transition cursor-pointer ${
+                        quizHistory[mIdx]?.passed
+                          ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                          : "bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 shadow-2xs"
+                      }`}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <FaClipboardCheck
+                          className={quizHistory[mIdx]?.passed ? "text-emerald-600" : "text-slate-400"}
+                        />
+                        <span>{quizHistory[mIdx]?.passed ? "Quiz Passed" : "Take Module Quiz"}</span>
+                      </span>
+                      <span
+                        className={`text-[10px] font-black ${
+                          quizHistory[mIdx]?.passed ? "text-emerald-700" : "text-indigo-600"
+                        }`}
+                      >
+                        {quizHistory[mIdx]?.passed
+                          ? `✓ ${quizHistory[mIdx].score}/${quizHistory[mIdx].total}`
+                          : "+150 XP"}
+                      </span>
+                    </button>
                   </div>
                 </div>
               ))}
