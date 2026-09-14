@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   FaGraduationCap, 
   FaLaptopCode, 
@@ -11,7 +11,17 @@ import {
   FaSpinner,
   FaCheckCircle,
   FaBookOpen,
-  FaExternalLinkAlt
+  FaExternalLinkAlt,
+  FaArrowRight,
+  FaArrowLeft,
+  FaLightbulb,
+  FaAward,
+  FaUserGraduate,
+  FaCheck,
+  FaStar,
+  FaRedo,
+  FaCompass,
+  FaThLarge
 } from 'react-icons/fa';
 import { generatePersonalizedQuestions } from '../../services/aiAssessmentService';
 
@@ -809,7 +819,13 @@ const careerRecommendations = {
 
 const CareerAssessment = ({ onClose }) => {
   const navigate = useNavigate();
-  const handleClose = onClose || (() => navigate('/'));
+  const handleClose = onClose || (() => {
+    if (localStorage.getItem('token') || localStorage.getItem('userInfo')) {
+      navigate('/dashboard');
+    } else {
+      navigate('/');
+    }
+  });
   const [currentStep, setCurrentStep] = useState('education');
   const [educationLevel, setEducationLevel] = useState('');
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -819,10 +835,34 @@ const CareerAssessment = ({ onClose }) => {
   const [aiQuestions, setAiQuestions] = useState([]);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [results, setResults] = useState(null);
+  const [previousResult, setPreviousResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [usedQuestionTopics, setUsedQuestionTopics] = useState(new Set());
   const [questionHistory, setQuestionHistory] = useState([]);
   const [questionHashes, setQuestionHashes] = useState(new Set());
+
+  useEffect(() => {
+    // Check for previous assessment results on load
+    const loadSavedResult = async () => {
+      try {
+        const assessmentService = await import('../../services/assessmentService');
+        const data = await assessmentService.default.getLatestAssessmentResult();
+        if (data?.result) {
+          setPreviousResult(data.result);
+        }
+      } catch (err) {
+        console.log('No prior assessment found:', err);
+      }
+    };
+    loadSavedResult();
+  }, []);
+
+  const viewPreviousResult = () => {
+    if (previousResult) {
+      setResults(previousResult);
+      setCurrentStep('results');
+    }
+  };
 
   const handleEducationSubmit = () => {
     if (educationLevel) {
@@ -1784,56 +1824,281 @@ const CareerAssessment = ({ onClose }) => {
     return 100;
   };
 
+  const categoryMap = {
+    technology: "Web Development",
+    creative: "Design & UI/UX",
+    analytical: "Data Science",
+    business: "Business & Tech",
+    education: "Business & Tech"
+  };
+
+  const colorClasses = {
+    blue: 'bg-blue-50/90 text-blue-950 border-blue-200',
+    purple: 'bg-purple-50/90 text-purple-950 border-purple-200',
+    green: 'bg-emerald-50/90 text-emerald-950 border-emerald-200',
+    indigo: 'bg-indigo-50/90 text-indigo-950 border-indigo-200',
+    amber: 'bg-amber-50/90 text-amber-950 border-amber-200'
+  };
+
+  // Common Header Banner rendered on every page step
+  const renderHeaderBanner = () => (
+    <div className="bg-white border-b border-slate-200 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-4">
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <Link to="/" className="hover:text-indigo-600 transition">Home</Link>
+          <span>/</span>
+          <span className="text-slate-800">AI Career Explorer</span>
+        </div>
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold tracking-wide uppercase">
+              <FaBrain className="text-indigo-600 text-xs" />
+              <span>AI Career Guidance & Aptitude Discovery</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mt-2">
+              AI Career Explorer & Aptitude Discovery
+            </h1>
+            <p className="text-slate-600 text-sm sm:text-base mt-1.5 max-w-2xl leading-relaxed">
+              Uncover your natural cognitive strengths, test core programming readiness, and let adaptive Gemini AI synthesize a custom career roadmap with matching EduPlatform courses.
+            </p>
+          </div>
+
+          {/* Quick Highlights / Badges */}
+          <div className="flex flex-wrap md:flex-col items-start gap-2 bg-slate-50 p-4 rounded-2xl border border-slate-200/80 text-xs text-slate-600 self-start shrink-0">
+            <div className="flex items-center gap-2 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>35 Curated & Adaptive Questions</span>
+            </div>
+            <div className="flex items-center gap-2 font-medium">
+              <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+              <span>~8–10 Minutes Completion</span>
+            </div>
+            <div className="flex items-center gap-2 font-medium">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>Personalized Course Roadmap</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Common Stepper Progress Tracker
+  const renderStepper = () => (
+    <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-xs mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+            Assessment Progress
+          </span>
+          <span className="text-slate-300">•</span>
+          <span className="text-xs font-semibold text-slate-600">
+            {currentStep === 'education' && "Stage 1: Background & Education Profile"}
+            {currentStep === 'assessment' && (
+              currentQuestion < 10 ? "Stage 2: Natural Passions & Interest Discovery" :
+              currentQuestion < 15 ? "Stage 3: Foundational Technical Literacy" :
+              "Stage 4: Adaptive Gemini AI Deep Dive"
+            )}
+            {currentStep === 'results' && "Stage 5: Career Report & Custom Learning Roadmap"}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {currentStep === 'assessment' && (
+            <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
+              Question {currentQuestion + 1} of 35
+            </span>
+          )}
+          <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">
+            {Math.round(getProgressPercentage())}%
+          </span>
+        </div>
+      </div>
+
+      {/* Progress Bar Track */}
+      <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden p-0.5 border border-slate-200/60">
+        <div
+          className="bg-gradient-to-r from-indigo-500 via-indigo-600 to-violet-600 h-full rounded-full transition-all duration-300 shadow-xs"
+          style={{ width: `${getProgressPercentage()}%` }}
+        />
+      </div>
+
+      {/* Visual Milestones */}
+      <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-slate-100 text-[11px] font-semibold text-slate-500">
+        <div className={`flex items-center gap-1.5 ${currentStep === 'education' ? 'text-indigo-600 font-bold' : (currentStep === 'assessment' || currentStep === 'results') ? 'text-emerald-600' : ''}`}>
+          <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${
+            currentStep === 'education' ? 'bg-indigo-600 text-white font-bold' :
+            (currentStep === 'assessment' || currentStep === 'results') ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'
+          }`}>
+            {(currentStep === 'assessment' || currentStep === 'results') ? '✓' : '1'}
+          </span>
+          <span className="hidden sm:inline">1. Education</span>
+        </div>
+
+        <div className={`flex items-center gap-1.5 ${currentStep === 'assessment' && currentQuestion < 10 ? 'text-indigo-600 font-bold' : (currentStep === 'assessment' && currentQuestion >= 10) || currentStep === 'results' ? 'text-emerald-600' : ''}`}>
+          <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${
+            currentStep === 'assessment' && currentQuestion < 10 ? 'bg-indigo-600 text-white font-bold' :
+            ((currentStep === 'assessment' && currentQuestion >= 10) || currentStep === 'results') ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'
+          }`}>
+            {((currentStep === 'assessment' && currentQuestion >= 10) || currentStep === 'results') ? '✓' : '2'}
+          </span>
+          <span className="hidden sm:inline">2. Interests (10)</span>
+        </div>
+
+        <div className={`flex items-center gap-1.5 ${currentStep === 'assessment' && currentQuestion >= 10 && currentQuestion < 15 ? 'text-indigo-600 font-bold' : (currentStep === 'assessment' && currentQuestion >= 15) || currentStep === 'results' ? 'text-emerald-600' : ''}`}>
+          <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${
+            currentStep === 'assessment' && currentQuestion >= 10 && currentQuestion < 15 ? 'bg-indigo-600 text-white font-bold' :
+            ((currentStep === 'assessment' && currentQuestion >= 15) || currentStep === 'results') ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'
+          }`}>
+            {((currentStep === 'assessment' && currentQuestion >= 15) || currentStep === 'results') ? '✓' : '3'}
+          </span>
+          <span className="hidden sm:inline">3. Knowledge (5)</span>
+        </div>
+
+        <div className={`flex items-center gap-1.5 ${currentStep === 'assessment' && currentQuestion >= 15 ? 'text-indigo-600 font-bold' : currentStep === 'results' ? 'text-emerald-600' : ''}`}>
+          <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${
+            currentStep === 'assessment' && currentQuestion >= 15 ? 'bg-indigo-600 text-white font-bold' :
+            currentStep === 'results' ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'
+          }`}>
+            {currentStep === 'results' ? '✓' : '4'}
+          </span>
+          <span className="hidden sm:inline">4. AI Deep Dive (20)</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 1. STEP: EDUCATION BACKGROUND SELECTION
   if (currentStep === 'education') {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-8">
-            <div className="text-center mb-8">
-              <FaGraduationCap className="text-6xl text-blue-600 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">Career Interest Assessment</h2>
-              <p className="text-gray-600">Let's discover your ideal career path!</p>
-            </div>
+      <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-24">
+        {renderHeaderBanner()}
 
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-4">What's your current education level?</h3>
-              <div className="space-y-3">
-                {[
-                  { value: 'school', label: 'High School Student', icon: '🎓' },
-                  { value: 'secondary', label: 'Higher Secondary Student', icon: '📚' },
-                  { value: 'undergraduate', label: 'Undergraduate Student', icon: '🎯' },
-                  { value: 'professional', label: 'Working Professional', icon: '💼' }
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setEducationLevel(option.value)}
-                    className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left flex items-center space-x-3 ${
-                      educationLevel === option.value
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <span className="text-2xl">{option.icon}</span>
-                    <span className="font-medium">{option.label}</span>
-                  </button>
-                ))}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          {renderStepper()}
+
+          {/* Previous Result Banner if Available */}
+          {previousResult && (
+            <div className="mb-8 p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-blue-50 border border-indigo-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg shrink-0 shadow-md">
+                  <FaAward />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">Previous Career Report on File</h4>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    You have an existing assessment recommendation for <span className="font-semibold text-indigo-700">{previousResult.recommendation?.title || previousResult.dominantInterest}</span>.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                <button
+                  onClick={viewPreviousResult}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs"
+                >
+                  View Saved Report
+                </button>
               </div>
             </div>
+          )}
 
-            <div className="flex justify-between">
+          {/* Education Selection Card */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-10 mb-8">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-4 text-3xl shadow-xs">
+                <FaUserGraduate />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">
+                What is your current background?
+              </h2>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Select your current level so our adaptive AI can calibrate question difficulty and tailor career suggestions specifically to your stage.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4 mb-8">
+              {[
+                { value: 'school', label: 'High School Student', desc: 'Exploring early tech interests, future college majors, and coding foundations.', icon: '🎓' },
+                { value: 'secondary', label: 'Higher Secondary Student', desc: 'Preparing for higher education degrees and technical specializations.', icon: '📚' },
+                { value: 'undergraduate', label: 'Undergraduate / College Student', desc: 'Targeting industry-ready skill sets, high-paying tech internships, and graduate roles.', icon: '🎯' },
+                { value: 'professional', label: 'Working Professional / Career Switcher', desc: 'Upskilling or transitioning into high-demand engineering, cloud, or AI careers.', icon: '💼' }
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setEducationLevel(option.value)}
+                  className={`p-5 rounded-2xl border-2 transition-all duration-200 text-left flex items-start space-x-4 cursor-pointer ${
+                    educationLevel === option.value
+                      ? 'border-indigo-600 bg-indigo-50/60 shadow-md ring-2 ring-indigo-500/20'
+                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/80 bg-white'
+                  }`}
+                >
+                  <span className="text-3xl p-2.5 bg-white rounded-xl shadow-xs border border-slate-100 shrink-0">{option.icon}</span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-900 text-sm sm:text-base">{option.label}</span>
+                      {educationLevel === option.value && (
+                        <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] shrink-0">
+                          <FaCheck />
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{option.desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-100">
               <button
                 onClick={handleClose}
-                className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5"
               >
-                Cancel
+                <FaArrowLeft className="text-[10px]" />
+                <span>Return to Dashboard</span>
               </button>
               <button
                 onClick={handleEducationSubmit}
                 disabled={!educationLevel}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-indigo-500/20 flex items-center justify-center gap-2"
               >
-                Start Assessment
+                <span>Begin Career Assessment</span>
+                <FaArrowRight className="text-xs" />
               </button>
+            </div>
+          </div>
+
+          {/* Value Props Grid */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-3">
+                <FaCompass />
+              </div>
+              <h4 className="text-sm font-bold text-slate-900 mb-1">Adaptive AI Profiling</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Evaluates your cognitive passions and problem-solving preferences to suggest matching industries.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-3">
+                <FaChartLine />
+              </div>
+              <h4 className="text-sm font-bold text-slate-900 mb-1">Industry Demand Calibration</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Aligns your natural strengths with high-growth technology sectors like Cloud, Full-Stack, and AI.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg mb-3">
+                <FaBookOpen />
+              </div>
+              <h4 className="text-sm font-bold text-slate-900 mb-1">EduPlatform Integration</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Connects directly to courses, certificates, and learning tracks available right on our platform.
+              </p>
             </div>
           </div>
         </div>
@@ -1841,159 +2106,228 @@ const CareerAssessment = ({ onClose }) => {
     );
   }
 
-  if (isGeneratingAI) {
+  // 2. IN-PAGE AI LOADING OR COMPUTING STATE
+  if (isGeneratingAI || isLoading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl p-8 text-center max-w-md">
-          <FaSpinner className="text-6xl text-blue-600 mx-auto mb-4 animate-spin" />
-          <h3 className="text-xl font-semibold mb-2">Generating Personalized Questions</h3>
-          <p className="text-gray-600">AI is creating questions based on your responses...</p>
+      <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-24">
+        {renderHeaderBanner()}
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          {renderStepper()}
+
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-10 sm:p-14 text-center max-w-2xl mx-auto my-6 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 animate-pulse"></div>
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-5 shadow-xs">
+              <FaSpinner className="text-3xl text-indigo-600 animate-spin" />
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2 tracking-tight">
+              {isLoading ? "Synthesizing Career Recommendations" : "AI Crafting Next Questions"}
+            </h3>
+            <p className="text-slate-600 text-sm max-w-md mx-auto leading-relaxed">
+              {isLoading 
+                ? "Gemini AI is analyzing your answers, technical readiness, and computing your personalized career roadmap..."
+                : "Gemini AI is analyzing your responses and generating personalized adaptive questions tailored to your profile..."}
+            </p>
+            <div className="mt-6 inline-flex items-center gap-2 text-xs font-bold text-indigo-700 bg-indigo-50 px-4 py-2 rounded-full border border-indigo-100">
+              <FaBrain className="text-indigo-600 text-xs animate-bounce" />
+              <span>Calibrating with current industry tech benchmarks</span>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl p-8 text-center max-w-md">
-          <FaSpinner className="text-6xl text-green-600 mx-auto mb-4 animate-spin" />
-          <h3 className="text-xl font-semibold mb-2">Analyzing Your Results</h3>
-          <p className="text-gray-600">We're calculating your career recommendations...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // 3. STEP: RESULTS AND PERSONALIZED CAREER REPORT
   if (currentStep === 'results' && results) {
     const { recommendation } = results;
-    const IconComponent = recommendation.icon;
-    const colorClasses = {
-      blue: 'bg-blue-100 text-blue-800 border-blue-200',
-      purple: 'bg-purple-100 text-purple-800 border-purple-200',
-      green: 'bg-green-100 text-green-800 border-green-200',
-      indigo: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      amber: 'bg-amber-100 text-amber-800 border-amber-200'
-    };
+    const IconComponent = recommendation?.icon || FaBriefcase;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-8">
-            <div className="text-center mb-8">
-              <FaCheckCircle className="text-6xl text-green-600 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">Assessment Complete!</h2>
-              <p className="text-gray-600">Here are your personalized career recommendations</p>
+      <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-24">
+        {renderHeaderBanner()}
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+          {renderStepper()}
+
+          {/* Success Notification Banner */}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-5 shadow-xs">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-3xl shrink-0 shadow-md">
+              <FaCheckCircle />
+            </div>
+            <div className="text-center sm:text-left">
+              <div className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                Assessment Complete
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
+                Your Personalized Tech Career Roadmap
+              </h2>
+              <p className="text-slate-600 text-sm mt-1">
+                We've evaluated your responses across interest, technical knowledge, and AI profiling to identify your top match.
+              </p>
+            </div>
+          </div>
+
+          {/* Dominant Career Recommendation Billboard */}
+          <div className={`rounded-3xl p-6 sm:p-10 border-2 shadow-md ${colorClasses[recommendation.color] || 'bg-indigo-50 border-indigo-200 text-indigo-900'}`}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-current/15">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-3xl shrink-0">
+                  <IconComponent />
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white text-xs font-black uppercase tracking-wider mb-1.5 shadow-xs">
+                    <FaStar className="text-amber-500 text-[11px]" />
+                    <span>Top Career Match</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black tracking-tight">{recommendation.title}</h3>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Link
+                  to={`/courses?category=${encodeURIComponent(categoryMap[results.dominantInterest] || 'Web Development')}`}
+                  className="px-6 py-3 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition shadow-md flex items-center gap-2"
+                >
+                  <FaBookOpen />
+                  <span>Browse Matching Courses</span>
+                </Link>
+              </div>
             </div>
 
-            <div className={`rounded-2xl p-6 mb-8 border-2 ${colorClasses[recommendation.color]}`}>
-              <div className="flex items-center mb-4">
-                <IconComponent className="text-4xl mr-4" />
-                <div>
-                  <h3 className="text-2xl font-bold">{recommendation.title}</h3>
-                  <p className="text-lg">{recommendation.description}</p>
-                </div>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <h4 className="text-xl font-semibold mb-3 flex items-center">
-                    <FaCertificate className="mr-2" />
-                    Recommended Certifications
-                  </h4>
-                  <div className="space-y-3">
-                    {recommendation.certifications.map((cert, index) => (
-                      <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h5 className="font-medium text-gray-900">{cert.name}</h5>
-                            <p className="text-sm text-gray-600">
-                              {cert.provider} • {cert.level}
-                            </p>
-                          </div>
-                          <a
-                            href={cert.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-3 bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm hover:bg-blue-700 transition duration-200 flex items-center"
-                          >
-                            <FaExternalLinkAlt className="mr-1 text-xs" />
-                            View
-                          </a>
-                        </div>
+            <p className="text-base sm:text-lg mt-6 leading-relaxed opacity-90">
+              {recommendation.description}
+            </p>
+
+            {/* Certifications & Target Roles */}
+            <div className="grid md:grid-cols-2 gap-6 mt-8">
+              {/* Certifications */}
+              <div className="bg-white rounded-2xl p-6 shadow-xs border border-white/60">
+                <h4 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <FaCertificate className="text-amber-500" />
+                  <span>Recommended Industry Certifications</span>
+                </h4>
+                <div className="space-y-3">
+                  {recommendation.certifications.map((cert, index) => (
+                    <div key={index} className="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between gap-3">
+                      <div>
+                        <h5 className="font-bold text-slate-900 text-sm">{cert.name}</h5>
+                        <p className="text-xs text-slate-500 mt-0.5">{cert.provider} • {cert.level}</p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="text-xl font-semibold mb-3 flex items-center">
-                    <FaBriefcase className="mr-2" />
-                    Career Opportunities
-                  </h4>
-                  <ul className="space-y-2">
-                    {recommendation.jobs.map((job, index) => (
-                      <li key={index} className="flex items-center">
-                        <span className="w-2 h-2 bg-current rounded-full mr-3"></span>
-                        {job}
-                      </li>
-                    ))}
-                  </ul>
+                      <a
+                        href={cert.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shrink-0 flex items-center gap-1 shadow-xs"
+                      >
+                        <span>View</span>
+                        <FaExternalLinkAlt className="text-[10px]" />
+                      </a>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Tech Courses Section */}
-              <div className="mt-8">
-                <h4 className="text-xl font-semibold mb-4 flex items-center">
-                  <FaBookOpen className="mr-2" />
-                  Recommended Tech Courses & Training
+              {/* Target Roles */}
+              <div className="bg-white rounded-2xl p-6 shadow-xs border border-white/60">
+                <h4 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <FaBriefcase className="text-indigo-600" />
+                  <span>High-Demand Industry Roles</span>
                 </h4>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {recommendation.courses.map((course, index) => (
-                    <div key={index} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-                      <h5 className="font-semibold text-gray-900 mb-2">{course.name}</h5>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <p><span className="font-medium">Provider:</span> {course.provider}</p>
-                        <p><span className="font-medium">Duration:</span> {course.duration}</p>
-                        <p><span className="font-medium">Type:</span> {course.type}</p>
-                      </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {recommendation.jobs.map((job, index) => (
+                    <div key={index} className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-800">
+                      <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0"></span>
+                      <span>{job}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 mb-8">
-              <h4 className="text-lg font-semibold mb-4">Assessment Summary</h4>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{results.totalQuestions}</div>
-                  <div className="text-sm text-gray-600">Questions Answered</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{results.knowledgeScore}/5</div>
-                  <div className="text-sm text-gray-600">Knowledge Score</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{results.educationLevel}</div>
-                  <div className="text-sm text-gray-600">Education Level</div>
-                </div>
+            {/* Recommended Course Modules */}
+            <div className="mt-8 bg-white rounded-2xl p-6 shadow-xs border border-white/60">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <FaBookOpen className="text-indigo-600" />
+                  <span>Recommended Curriculum & Tech Modules</span>
+                </h4>
+                <Link
+                  to="/courses"
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition"
+                >
+                  View Full Catalog &rarr;
+                </Link>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {recommendation.courses.map((course, index) => (
+                  <div key={index} className="bg-gradient-to-br from-slate-50 to-indigo-50/40 rounded-xl p-4 border border-slate-200/80">
+                    <h5 className="font-bold text-slate-900 text-sm mb-1.5">{course.name}</h5>
+                    <div className="flex flex-wrap gap-2 text-[11px] text-slate-600">
+                      <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                        Provider: {course.provider}
+                      </span>
+                      <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                        Duration: {course.duration}
+                      </span>
+                      <span className="bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded-md">
+                        {course.type}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+          </div>
 
-            <div className="flex justify-between">
-              <button
-                onClick={resetAssessment}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          {/* Assessment Scorecard */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
+            <h4 className="text-base font-bold text-slate-900 mb-6">Assessment Scorecard & Metrics</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 text-center">
+                <div className="text-3xl font-black text-indigo-600">{results.totalQuestions || 35}</div>
+                <div className="text-xs font-bold text-slate-600 mt-1">Questions Answered</div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 text-center">
+                <div className="text-3xl font-black text-emerald-600">{results.knowledgeScore}/5</div>
+                <div className="text-xs font-bold text-slate-600 mt-1">Technical Readiness Score</div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100 text-center">
+                <div className="text-2xl font-black text-amber-600 capitalize">
+                  {results.educationLevel || 'Undergraduate'}
+                </div>
+                <div className="text-xs font-bold text-slate-600 mt-1">Education Profile</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Actions Footer */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-white rounded-3xl border border-slate-200/80 shadow-xs">
+            <button
+              onClick={resetAssessment}
+              className="w-full sm:w-auto px-6 py-3 border border-slate-300 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-50 transition flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FaRedo />
+              <span>Retake Assessment</span>
+            </button>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+              <Link
+                to="/dashboard"
+                className="w-full sm:w-auto px-6 py-3 border border-indigo-200 bg-indigo-50 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-100 transition text-center"
               >
-                Retake Assessment
-              </button>
-              <button
-                onClick={onClose}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                Go to My Dashboard
+              </Link>
+              <Link
+                to={`/courses?category=${encodeURIComponent(categoryMap[results.dominantInterest] || 'Web Development')}`}
+                className="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-bold text-xs rounded-xl hover:bg-indigo-700 transition shadow-sm text-center flex items-center justify-center gap-2"
               >
-                Explore Courses
-              </button>
+                <span>Explore Matching Courses</span>
+                <FaArrowRight className="text-[10px]" />
+              </Link>
             </div>
           </div>
         </div>
@@ -2001,75 +2335,99 @@ const CareerAssessment = ({ onClose }) => {
     );
   }
 
+  // 4. STEP: ACTIVE QUESTION ANSWERING
   const question = getCurrentQuestion();
-  if (!question) return null;
+  if (!question) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-24">
+        {renderHeaderBanner()}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          {renderStepper()}
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-12 text-center max-w-lg mx-auto">
+            <FaSpinner className="text-3xl text-indigo-600 animate-spin mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-slate-800">Preparing next question...</h3>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-8">
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Question {currentQuestion + 1} of 35</span>
-              <span>{Math.round(getProgressPercentage())}% Complete</span>
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-24">
+      {renderHeaderBanner()}
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        {renderStepper()}
+
+        {/* Question Card */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-10 mb-8">
+          {/* Question Stage Indicator */}
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-lg shrink-0">
+                {currentQuestion < 10 && <FaBrain />}
+                {currentQuestion >= 10 && currentQuestion < 15 && <FaLaptopCode className="text-emerald-600" />}
+                {currentQuestion >= 15 && <FaRocket className="text-violet-600" />}
+              </div>
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-600">
+                  {currentQuestion < 10 ? 'Phase 1: Interest Discovery' : 
+                   currentQuestion < 15 ? 'Phase 2: Knowledge Assessment' : 
+                   'Phase 3: Adaptive Gemini AI'}
+                </div>
+                <div className="text-xs text-slate-500">
+                  {currentQuestion < 10 ? 'Discovering your work preferences & natural affinities' :
+                   currentQuestion < 15 ? 'Checking foundational tech & coding literacy' :
+                   'Dynamic questions generated specifically based on your answers'}
+                </div>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${getProgressPercentage()}%` }}
-              ></div>
+
+            <div className="text-xs font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+              #{currentQuestion + 1}
             </div>
           </div>
 
-          {/* Question Section */}
-          <div className="mb-8">
-            <div className="flex items-center mb-4">
-              {currentQuestion < 10 && <FaBrain className="text-blue-600 text-2xl mr-3" />}
-              {currentQuestion >= 10 && currentQuestion < 15 && <FaLaptopCode className="text-green-600 text-2xl mr-3" />}
-              {currentQuestion >= 15 && <FaRocket className="text-purple-600 text-2xl mr-3" />}
-              <span className="text-sm font-medium text-gray-500">
-                {currentQuestion < 10 ? 'Interest Assessment' : 
-                 currentQuestion < 15 ? 'Knowledge Assessment' : 
-                 'Personalized Questions'}
-              </span>
-            </div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
-              {question.question}
-            </h3>
-          </div>
+          {/* Question Statement */}
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-8 leading-snug tracking-tight">
+            {question.question}
+          </h2>
 
           {/* Options */}
-          <div className="space-y-3 mb-8">
+          <div className="space-y-3.5 mb-8">
             {question.options.map((option, index) => (
               <button
                 key={index}
                 onClick={() => handleAnswerSelect(option)}
-                className="w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 focus:outline-none focus:border-blue-500"
+                className="w-full p-4 sm:p-5 text-left border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/40 rounded-2xl transition-all duration-200 group flex items-center justify-between shadow-xs hover:shadow-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
               >
-                <div className="flex items-center">
-                  <span className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center mr-4 text-sm font-medium">
+                <div className="flex items-center gap-4">
+                  <span className="w-9 h-9 rounded-xl border-2 border-slate-200 group-hover:border-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center text-sm font-bold text-slate-600 transition-colors shrink-0">
                     {String.fromCharCode(65 + index)}
                   </span>
-                  <span className="font-medium">{option.text}</span>
+                  <span className="font-semibold text-slate-800 text-sm sm:text-base group-hover:text-slate-900 leading-relaxed">
+                    {option.text}
+                  </span>
                 </div>
+                <FaArrowRight className="text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition text-xs shrink-0 ml-3" />
               </button>
             ))}
           </div>
 
-          {/* Footer */}
-          <div className="flex justify-between">
+          {/* Question Card Footer */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-slate-100 text-xs text-slate-500">
             <button
               onClick={handleClose}
-              className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="text-slate-500 hover:text-slate-800 font-semibold transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
             >
-              Exit Assessment
+              <FaArrowLeft className="text-[10px]" />
+              <span>Exit to Dashboard</span>
             </button>
-            <div className="text-sm text-gray-500">
-              {currentQuestion < 10 ? 'Finding your interests...' :
-               currentQuestion < 15 ? 'Testing your knowledge...' :
-               'Personalizing your experience...'}
-            </div>
+            <span className="italic self-end sm:self-auto text-slate-400">
+              {currentQuestion < 10 ? 'Select the option that most resonates with your passions' :
+               currentQuestion < 15 ? 'Select the best answer based on your knowledge' :
+               'Personalized AI question based on your previous responses'}
+            </span>
           </div>
         </div>
       </div>

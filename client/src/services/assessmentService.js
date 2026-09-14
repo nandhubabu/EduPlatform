@@ -1,15 +1,27 @@
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+import { BASE_URL } from '../utils/utils';
 
 class AssessmentService {
   async saveAssessmentResult(assessmentData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/assessment/save`, {
+      const payload = {
+        scores: assessmentData.scores || assessmentData.interestScores || { knowledgeScore: assessmentData.knowledgeScore || 0 },
+        topInterests: assessmentData.topInterests || (assessmentData.dominantInterest ? [assessmentData.dominantInterest] : ["technology"]),
+        recommendations: assessmentData.recommendations || (assessmentData.recommendation?.title ? [assessmentData.recommendation.title] : []),
+        dominantInterest: assessmentData.dominantInterest,
+        recommendation: assessmentData.recommendation,
+        knowledgeScore: assessmentData.knowledgeScore,
+        educationLevel: assessmentData.educationLevel,
+        completedAt: assessmentData.completedAt || new Date().toISOString(),
+        totalQuestions: assessmentData.totalQuestions || 35,
+      };
+
+      const response = await fetch(`${BASE_URL}/users/assessment/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(assessmentData)
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -25,7 +37,7 @@ class AssessmentService {
 
   async getAssessmentResults() {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/assessment/results`, {
+      const response = await fetch(`${BASE_URL}/users/assessment/results`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +69,7 @@ class AssessmentService {
 
   async getLatestAssessmentResult() {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/assessment/latest`, {
+      const response = await fetch(`${BASE_URL}/users/assessment/latest`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
