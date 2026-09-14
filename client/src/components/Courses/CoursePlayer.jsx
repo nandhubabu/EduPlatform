@@ -37,6 +37,10 @@ import {
   FaExternalLinkAlt,
   FaQrcode,
   FaPrint,
+  FaThumbsUp,
+  FaReply,
+  FaSearch,
+  FaFilter,
 } from "react-icons/fa";
 import { getCourseById } from "../../services/courseService";
 import AlertMessage from "../Alert/AlertMessage";
@@ -44,7 +48,7 @@ import { getRealCourseById } from "../../data/realCourses";
 import chatbotService from "../../services/chatbotService";
 
 // YouTube Video Player Component
-const YouTubePlayer = ({ videoId, onProgress, onComplete, initialTime = 0 }) => {
+const YouTubePlayer = ({ videoId, onProgress, onComplete, onPlayerReady, initialTime = 0 }) => {
   const [player, setPlayer] = useState(null);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -92,6 +96,7 @@ const YouTubePlayer = ({ videoId, onProgress, onComplete, initialTime = 0 }) => 
             setPlayer(event.target);
             setIsReady(true);
             setDuration(event.target.getDuration());
+            onPlayerReady?.(event.target);
           },
           onStateChange: (event) => {
             if (event.data === window.YT.PlayerState.PLAYING) {
@@ -599,6 +604,199 @@ export default function CoursePlayer() {
   });
   const [copiedCertLink, setCopiedCertLink] = useState(false);
 
+  // Video Player instance for interactive seeking
+  const [ytPlayer, setYtPlayer] = useState(null);
+
+  // Q&A Community State
+  const [qaQuestions, setQaQuestions] = useState(() => {
+    const defaultQA = [
+      {
+        id: "qa-1",
+        lessonId: "default-lec",
+        lessonTitle: "Core Architectural Foundations",
+        author: "Elena Rostova",
+        authorInitial: "E",
+        date: "2 days ago",
+        timestamp: "03:15",
+        title: "Best practice for state isolation vs global stores in large modules?",
+        body: "When designing modular applications, at what point should state be elevated to a global store versus kept local to component hierarchies?",
+        upvotes: 16,
+        hasUpvoted: false,
+        replies: [
+          {
+            id: "rep-1",
+            author: "EduPlatform Faculty",
+            isInstructor: true,
+            date: "1 day ago",
+            text: "Rule of thumb: keep state co-located as close as possible to the consumers. Only promote state to global contexts when two distant sibling trees need synchronized access without prop drilling.",
+            upvotes: 11,
+          },
+        ],
+      },
+      {
+        id: "qa-2",
+        lessonId: "default-lec",
+        lessonTitle: "Core Architectural Foundations",
+        author: "Marcus Vance",
+        authorInitial: "M",
+        date: "Yesterday",
+        timestamp: "06:40",
+        title: "Handling network latency and optimistic mutations gracefully?",
+        body: "In video timestamp 06:40, what is the best strategy if an optimistic update fails on the server after UI already updated?",
+        upvotes: 9,
+        hasUpvoted: false,
+        replies: [
+          {
+            id: "rep-2",
+            author: "Senior Architect",
+            isInstructor: true,
+            date: "14 hours ago",
+            text: "Always snapshot previous state before applying the optimistic mutation. In your catch/rollback handler, revert immediately to the snapshot and flash a non-intrusive retry toast.",
+            upvotes: 7,
+          },
+        ],
+      },
+    ];
+
+    try {
+      const saved = localStorage.getItem(`edu_qa_${courseId}`);
+      return saved ? JSON.parse(saved) : defaultQA;
+    } catch {
+      return defaultQA;
+    }
+  });
+
+  const [qaFilter, setQaFilter] = useState("all");
+  const [qaSearch, setQaSearch] = useState("");
+  const [isAskingQuestion, setIsAskingQuestion] = useState(false);
+  const [newQuestionTitle, setNewQuestionTitle] = useState("");
+  const [newQuestionBody, setNewQuestionBody] = useState("");
+  const [newQuestionTimestamp, setNewQuestionTimestamp] = useState("");
+  const [activeReplyId, setActiveReplyId] = useState(null);
+  const [replyText, setReplyText] = useState("");
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(`edu_qa_${courseId}`, JSON.stringify(qaQuestions));
+    } catch {
+      // ignore
+    }
+  }, [courseId, qaQuestions]);
+
+  const handleSeekToTimestamp = (timeStr) => {
+    if (!timeStr || !ytPlayer) return;
+    const parts = timeStr.split(":").map(Number);
+    let seconds = 0;
+    if (parts.length === 2) {
+      seconds = parts[0] * 60 + parts[1];
+    } else if (parts.length === 3) {
+      seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+    try {
+      ytPlayer.seekTo(seconds, true);
+      ytPlayer.playVideo();
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleCaptureCurrentTime = () => {
+    if (!ytPlayer || !ytPlayer.getCurrentTime) {
+      setNewQuestionTimestamp("02:15");
+      return;
+    }
+    try {
+      const sec = Math.floor(ytPlayer.getCurrentTime());
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      setNewQuestionTimestamp(`${m}:${s.toString().padStart(2, "0")}`);
+    } catch {
+      setNewQuestionTimestamp("01:30");
+    }
+  };
+
+  const handleUpvoteQuestion = (qId) => {
+    setQaQuestions((prev) =>
+      prev.map((q) => {
+        if (q.id === qId) {
+          const hasUpvoted = !q.hasUpvoted;
+          return {
+            ...q,
+            hasUpvoted,
+            upvotes: hasUpvoted ? q.upvotes + 1 : q.upvotes - 1,
+          };
+        }
+        return q;
+      })
+    );
+  };
+
+  const handlePostQuestion = (e) => {
+    e.preventDefault();
+    if (!newQuestionTitle.trim() || !newQuestionBody.trim()) return;
+
+    const newQ = {
+      id: `qa-${Date.now()}`,
+      lessonId: currentLesson?._id,
+      lessonTitle: currentLesson?.title,
+      author: userProfile?.username || userProfile?.name || "Fellow Learner",
+      authorInitial: (userProfile?.username || "You")[0].toUpperCase(),
+      date: "Just now",
+      timestamp: newQuestionTimestamp.trim() || null,
+      title: newQuestionTitle.trim(),
+      body: newQuestionBody.trim(),
+      upvotes: 1,
+      hasUpvoted: true,
+      replies: [],
+    };
+
+    setQaQuestions((prev) => [newQ, ...prev]);
+    setNewQuestionTitle("");
+    setNewQuestionBody("");
+    setNewQuestionTimestamp("");
+    setIsAskingQuestion(false);
+  };
+
+  const handlePostReply = (qId) => {
+    if (!replyText.trim()) return;
+
+    const newReply = {
+      id: `rep-${Date.now()}`,
+      author: userProfile?.username || userProfile?.name || "Student Peer",
+      isInstructor: false,
+      date: "Just now",
+      text: replyText.trim(),
+      upvotes: 0,
+    };
+
+    setQaQuestions((prev) =>
+      prev.map((q) => {
+        if (q.id === qId) {
+          return {
+            ...q,
+            replies: [...(q.replies || []), newReply],
+          };
+        }
+        return q;
+      })
+    );
+
+    setReplyText("");
+    setActiveReplyId(null);
+  };
+
+  const filteredQuestions = useMemo(() => {
+    return qaQuestions.filter((q) => {
+      const matchesLecture =
+        qaFilter === "all" || q.lessonId === currentLesson?._id;
+      const matchesSearch =
+        !qaSearch.trim() ||
+        q.title.toLowerCase().includes(qaSearch.toLowerCase()) ||
+        q.body.toLowerCase().includes(qaSearch.toLowerCase());
+      return matchesLecture && matchesSearch;
+    });
+  }, [qaQuestions, qaFilter, qaSearch, currentLesson?._id]);
+
   const handleAddToLinkedIn = () => {
     const orgName = "EduPlatform";
     const certName = course?.title || "Professional Specialization";
@@ -1083,6 +1281,7 @@ export default function CoursePlayer() {
               <YouTubePlayer
                 videoId={currentLesson?.content?.youtubeId || "SqcY0GlETPk"}
                 onComplete={() => currentLesson?._id && toggleLessonCompletion(currentLesson._id)}
+                onPlayerReady={(p) => setYtPlayer(p)}
               />
             ) : (
               <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-8 space-y-4 min-h-[360px] flex flex-col justify-center">
@@ -1661,23 +1860,249 @@ export default function CoursePlayer() {
                   </div>
                 )}
 
+                {/* ─── COMMUNITY Q&A DISCUSSION FORUM ───────────────────── */}
                 {activeTab === "qa" && (
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-bold text-slate-900">Questions & Discussions</h3>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-[10px] text-white">
-                          A
+                  <div className="space-y-6">
+                    {/* Q&A Header & Filter Toolbar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <FaSearch className="text-slate-400 text-xs absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            value={qaSearch}
+                            onChange={(e) => setQaSearch(e.target.value)}
+                            placeholder="Search questions in this course..."
+                            className="pl-8 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-indigo-600 w-52 sm:w-64"
+                          />
                         </div>
-                        <span className="font-bold text-slate-800">Alex Tan</span>
-                        <span className="text-slate-500">2 days ago</span>
+
+                        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+                          <button
+                            type="button"
+                            onClick={() => setQaFilter("all")}
+                            className={`px-3 py-1 rounded-lg transition ${
+                              qaFilter === "all"
+                                ? "bg-white text-indigo-700 shadow-2xs font-bold"
+                                : "text-slate-600 hover:text-slate-900"
+                            }`}
+                          >
+                            All Questions
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setQaFilter("current")}
+                            className={`px-3 py-1 rounded-lg transition ${
+                              qaFilter === "current"
+                                ? "bg-white text-indigo-700 shadow-2xs font-bold"
+                                : "text-slate-600 hover:text-slate-900"
+                            }`}
+                          >
+                            This Lecture
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-slate-700">
-                        Is it better to handle state normalization on the client or let backend handle response shaping?
-                      </p>
-                      <div className="pl-4 border-l-2 border-slate-200 text-slate-600 text-[11px] pt-1">
-                        <strong className="text-indigo-600">Instructor:</strong> Whenever possible, keep payload formats consistent from your REST/GraphQL layer to minimize client transformations!
-                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsAskingQuestion(!isAskingQuestion)}
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center justify-center gap-2 cursor-pointer self-start sm:self-auto"
+                      >
+                        <FaQuestionCircle className="text-xs" />
+                        <span>{isAskingQuestion ? "Cancel" : "Ask a New Question"}</span>
+                      </button>
+                    </div>
+
+                    {/* Ask Question Drawer */}
+                    {isAskingQuestion && (
+                      <form
+                        onSubmit={handlePostQuestion}
+                        className="p-5 bg-indigo-50/50 border border-indigo-100 rounded-2xl space-y-3 animate-fadeIn shadow-2xs"
+                      >
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-black uppercase tracking-wider text-indigo-900">
+                            Post to Lecture Discussion
+                          </h4>
+                          <button
+                            type="button"
+                            onClick={handleCaptureCurrentTime}
+                            className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-indigo-200 transition cursor-pointer"
+                            title="Stamp current video time"
+                          >
+                            <FaClock className="text-[10px]" />
+                            <span>Stamp Current Video Time</span>
+                          </button>
+                        </div>
+
+                        <input
+                          type="text"
+                          required
+                          value={newQuestionTitle}
+                          onChange={(e) => setNewQuestionTitle(e.target.value)}
+                          placeholder="What is your question? (e.g. Why did we use useMemo here?)"
+                          className="w-full bg-white border border-slate-200 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-indigo-600"
+                        />
+
+                        <div className="flex gap-2">
+                          <textarea
+                            required
+                            rows={3}
+                            value={newQuestionBody}
+                            onChange={(e) => setNewQuestionBody(e.target.value)}
+                            placeholder="Provide any details, expected behavior, or error messages..."
+                            className="flex-1 bg-white border border-slate-200 p-3 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-indigo-600"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-slate-500 font-medium">Timestamp:</span>
+                            <input
+                              type="text"
+                              value={newQuestionTimestamp}
+                              onChange={(e) => setNewQuestionTimestamp(e.target.value)}
+                              placeholder="e.g. 03:45 (optional)"
+                              className="bg-white border border-slate-200 px-2.5 py-1 rounded-lg text-xs w-32 font-mono text-indigo-700"
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
+                          >
+                            Publish Question
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
+                    {/* Questions Stream */}
+                    <div className="space-y-4">
+                      {filteredQuestions.length === 0 ? (
+                        <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                          <p className="text-sm font-bold text-slate-700">No questions found matching your search</p>
+                          <p className="text-xs text-slate-500">Be the first to ask a question for this lesson!</p>
+                        </div>
+                      ) : (
+                        filteredQuestions.map((q) => (
+                          <div
+                            key={q.id}
+                            className="p-5 bg-white border border-slate-200 rounded-2xl shadow-2xs space-y-3"
+                          >
+                            {/* Question Header */}
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                                  {q.authorInitial || q.author[0]}
+                                </div>
+                                <div>
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="font-bold text-xs text-slate-900">{q.author}</span>
+                                    <span className="text-[10px] text-slate-400">&bull; {q.date}</span>
+                                    {q.timestamp && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleSeekToTimestamp(q.timestamp)}
+                                        className="text-[10px] font-mono font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded border border-indigo-200 transition flex items-center gap-1 cursor-pointer"
+                                        title={`Jump video to ${q.timestamp}`}
+                                      >
+                                        <FaPlay className="text-[7px]" />
+                                        <span>{q.timestamp}</span>
+                                      </button>
+                                    )}
+                                  </div>
+                                  <h4 className="font-bold text-sm text-slate-900 mt-1">{q.title}</h4>
+                                </div>
+                              </div>
+
+                              {/* Upvote Button */}
+                              <button
+                                type="button"
+                                onClick={() => handleUpvoteQuestion(q.id)}
+                                className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                                  q.hasUpvoted
+                                    ? "bg-indigo-50 border-indigo-300 text-indigo-700"
+                                    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                                }`}
+                              >
+                                <FaThumbsUp className="text-[10px]" />
+                                <span>{q.upvotes}</span>
+                              </button>
+                            </div>
+
+                            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed pl-11">
+                              {q.body}
+                            </p>
+
+                            {/* Replies Thread */}
+                            {q.replies && q.replies.length > 0 && (
+                              <div className="pl-11 space-y-2.5 pt-2 border-t border-slate-100">
+                                {q.replies.map((rep) => (
+                                  <div
+                                    key={rep.id}
+                                    className={`p-3.5 rounded-xl text-xs space-y-1.5 border ${
+                                      rep.isInstructor
+                                        ? "bg-indigo-50/70 border-indigo-200 text-indigo-950"
+                                        : "bg-slate-50 border-slate-200 text-slate-800"
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-bold text-slate-900">{rep.author}</span>
+                                        {rep.isInstructor && (
+                                          <span className="text-[9px] font-black uppercase px-1.5 py-0.2 bg-indigo-600 text-white rounded">
+                                            Instructor
+                                          </span>
+                                        )}
+                                        <span className="text-[10px] text-slate-400">&bull; {rep.date}</span>
+                                      </div>
+                                    </div>
+                                    <p className="leading-relaxed">{rep.text}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Reply Input Box */}
+                            <div className="pl-11 pt-1 flex items-center gap-2">
+                              {activeReplyId === q.id ? (
+                                <div className="flex-1 flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={replyText}
+                                    onChange={(e) => setReplyText(e.target.value)}
+                                    placeholder="Write a helpful response..."
+                                    className="flex-1 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-indigo-600"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePostReply(q.id)}
+                                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition cursor-pointer"
+                                  >
+                                    Post
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setActiveReplyId(null)}
+                                    className="px-2 py-1.5 text-xs text-slate-500 hover:text-slate-800 cursor-pointer"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveReplyId(q.id)}
+                                  className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition cursor-pointer"
+                                >
+                                  <FaReply className="text-[10px]" />
+                                  <span>Reply to thread</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}
