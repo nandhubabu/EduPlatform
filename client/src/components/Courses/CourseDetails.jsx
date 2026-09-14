@@ -258,6 +258,17 @@ export default function CourseDetails() {
                 <span>English [Auto]</span>
               </div>
             </div>
+
+            {/* Class Leaderboard Shortcut */}
+            <div className="pt-1">
+              <Link
+                to={`/students-position/${courseId}`}
+                className="inline-flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3.5 py-1.5 rounded-xl transition shadow-xs"
+              >
+                <FaAward className="text-amber-500" />
+                <span>View Student Leaderboard &amp; Rankings &rarr;</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -387,14 +387,22 @@ export default function Courses() {
           c.title?.toLowerCase().includes(q) ||
           c.description?.toLowerCase().includes(q) ||
           c.category?.toLowerCase().includes(q) ||
+          c.instructor?.toLowerCase().includes(q) ||
           c.user?.username?.toLowerCase().includes(q)
       );
     }
 
     if (selectedCategory) {
-      result = result.filter(
-        (c) => c.category?.toLowerCase() === selectedCategory.toLowerCase()
-      );
+      const sel = selectedCategory.toLowerCase();
+      result = result.filter((c) => {
+        const cat = c.category?.toLowerCase() || "";
+        return (
+          cat === sel ||
+          (sel.includes("cloud") && cat.includes("cloud")) ||
+          (sel.includes("business") && cat.includes("business")) ||
+          (sel.includes("design") && cat.includes("design"))
+        );
+      });
     }
 
     if (selectedDifficulty && selectedDifficulty !== "All Levels") {

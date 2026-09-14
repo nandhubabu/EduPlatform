@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import {
   FaPlay,
@@ -22,6 +23,7 @@ import {
   FaChevronUp,
   FaCheck,
   FaFolderOpen,
+  FaTimes,
 } from "react-icons/fa";
 import { getCourseById } from "../../services/courseService";
 import AlertMessage from "../Alert/AlertMessage";
@@ -111,14 +113,46 @@ const YouTubePlayer = ({ videoId, onProgress, onComplete, initialTime = 0 }) => 
 export default function CoursePlayer() {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const { userProfile } = useSelector((state) => state.auth || {});
 
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
-  const [progress, setProgress] = useState({});
+  const [progress, setProgress] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`edu_progress_${courseId}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [showSidebar, setShowSidebar] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [notes, setNotes] = useState("");
-  const [savedNotes, setSavedNotes] = useState([]);
+  const [savedNotes, setSavedNotes] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`edu_notes_${courseId}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [showCertificateModal, setShowCertificateModal] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(`edu_progress_${courseId}`, JSON.stringify(progress));
+    } catch {
+      // ignore
+    }
+  }, [courseId, progress]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(`edu_notes_${courseId}`, JSON.stringify(savedNotes));
+    } catch {
+      // ignore
+    }
+  }, [courseId, savedNotes]);
 
   // Fetch course
   const { data: courseData, isLoading, error } = useQuery({
@@ -324,18 +358,37 @@ export default function CoursePlayer() {
           </div>
         </div>
 
-        {/* Progress & Sidebar Toggle */}
-        <div className="flex items-center gap-4 flex-shrink-0">
+        {/* Progress, Leaderboard, Certificate & Sidebar Toggle */}
+        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+          <Link
+            to={`/students-position/${courseId}`}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-bold transition shadow-xs"
+            title="Class Leaderboard"
+          >
+            <FaAward className="text-amber-500" />
+            <span>Leaderboard</span>
+          </Link>
+
+          {progressPercent === 100 && (
+            <button
+              onClick={() => setShowCertificateModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition shadow-sm animate-bounce"
+            >
+              <FaGraduationCap className="text-sm" />
+              <span>Certificate</span>
+            </button>
+          )}
+
           {/* Progress Widget (Udemy Style) */}
           <div className="hidden sm:flex items-center gap-3">
-            <div className="w-32 bg-slate-100 border border-slate-200 rounded-full h-2 overflow-hidden">
+            <div className="w-28 sm:w-32 bg-slate-100 border border-slate-200 rounded-full h-2 overflow-hidden">
               <div
                 className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
             <span className="text-xs font-bold text-slate-700">
-              {progressPercent}% Complete
+              {progressPercent}%
             </span>
           </div>
 
@@ -607,6 +660,66 @@ export default function CoursePlayer() {
           </aside>
         )}
       </div>
+
+      {/* CERTIFICATE OF COMPLETION MODAL */}
+      {showCertificateModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-8 shadow-2xl relative space-y-6 animate-fadeIn">
+            <button
+              onClick={() => setShowCertificateModal(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-2 rounded-xl hover:bg-slate-100 transition cursor-pointer"
+            >
+              <FaTimes />
+            </button>
+
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 text-white flex items-center justify-center text-3xl mx-auto shadow-lg">
+                <FaGraduationCap />
+              </div>
+              <span className="text-xs font-black tracking-wider uppercase text-indigo-600">
+                Official EduPlatform Certificate
+              </span>
+              <h2 className="text-2xl font-black text-slate-900">Certificate of Completion</h2>
+              <p className="text-xs text-slate-500">
+                This verified credential confirms full mastery of all course lectures, practical projects, and milestones.
+              </p>
+            </div>
+
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-3">
+              <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Awarded to</p>
+              <h3 className="text-xl font-black text-slate-900">
+                {userProfile?.username || userProfile?.name || "Student Graduate"}
+              </h3>
+              <p className="text-xs text-slate-500">for successfully completing</p>
+              <h4 className="text-sm font-bold text-indigo-700">
+                {course.title}
+              </h4>
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                <span>Instructor: <strong>{course.instructor || course.user?.username || "EduPlatform Faculty"}</strong></span>
+                <span>Date: <strong>{new Date().toLocaleDateString()}</strong></span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  window.print();
+                }}
+                className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              >
+                <FaDownload className="text-xs" />
+                <span>Download / Print Certificate</span>
+              </button>
+              <button
+                onClick={() => setShowCertificateModal(false)}
+                className="px-5 py-3 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
