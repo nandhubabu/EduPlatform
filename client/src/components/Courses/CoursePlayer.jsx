@@ -41,6 +41,10 @@ import {
   FaReply,
   FaSearch,
   FaFilter,
+  FaCalendarAlt,
+  FaCalendarPlus,
+  FaFire,
+  FaBell,
 } from "react-icons/fa";
 import { getCourseById } from "../../services/courseService";
 import AlertMessage from "../Alert/AlertMessage";
@@ -1003,6 +1007,184 @@ export default function CoursePlayer() {
     ? Math.round((completedLessonsCount / totalLessonsCount) * 100)
     : 0;
 
+  // ─── SMART STUDY PLANNER & CALENDAR STATE ────────────────────────────
+  const [showPlannerModal, setShowPlannerModal] = useState(false);
+  const [plannerSavedToast, setPlannerSavedToast] = useState(false);
+  const [plannerSettings, setPlannerSettings] = useState(() => {
+    const defaultSettings = {
+      weeklyHours: 3,
+      preferredDays: ["Mon", "Wed", "Fri"],
+      preferredTime: "19:00",
+      streakDays: 3,
+    };
+    try {
+      const saved = localStorage.getItem(`edu_planner_${courseId}`);
+      return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
+    } catch {
+      return defaultSettings;
+    }
+  });
+
+  const remainingLessonsCount = Math.max(0, totalLessonsCount - completedLessonsCount);
+  const estimatedRemainingHours = useMemo(() => {
+    if (remainingLessonsCount === 0) return 0;
+    return Math.max(0.5, Math.round(remainingLessonsCount * 0.35 * 10) / 10);
+  }, [remainingLessonsCount]);
+
+  const projectedGraduationInfo = useMemo(() => {
+    if (remainingLessonsCount === 0) {
+      return {
+        completed: true,
+        text: "Curriculum 100% Completed!",
+        dateStr: "Course Finished",
+        weeksFormatted: "Completed!",
+        weeks: 0,
+      };
+    }
+    const weeklyH = plannerSettings.weeklyHours || 3;
+    const weeks = Math.max(0.2, estimatedRemainingHours / weeklyH);
+    const days = Math.ceil(weeks * 7);
+    const targetDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+    const dateStr = targetDate.toLocaleDateString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    const weeksFormatted = weeks < 1 ? "Less than 1 week" : `~${Math.round(weeks)} week${Math.round(weeks) > 1 ? "s" : ""}`;
+
+    return {
+      completed: false,
+      dateStr,
+      weeksFormatted,
+      days,
+      weeks,
+    };
+  }, [remainingLessonsCount, estimatedRemainingHours, plannerSettings.weeklyHours]);
+
+  const daysPerWeek = plannerSettings.preferredDays?.length || 1;
+  const minutesPerSession = Math.round(((plannerSettings.weeklyHours || 3) * 60) / Math.max(1, daysPerWeek));
+
+  const handleUpdatePlanner = (key, value) => {
+    setPlannerSettings((prev) => {
+      const next = { ...prev, [key]: value };
+      try {
+        localStorage.setItem(`edu_planner_${courseId}`, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
+  const handleTogglePlannerDay = (day) => {
+    const current = plannerSettings.preferredDays || [];
+    let updated;
+    if (current.includes(day)) {
+      if (current.length <= 1) return;
+      updated = current.filter((d) => d !== day);
+    } else {
+      updated = [...current, day];
+    }
+    handleUpdatePlanner("preferredDays", updated);
+  };
+
+  const handleSavePlanner = (e) => {
+    if (e) e.preventDefault();
+    try {
+      localStorage.setItem(`edu_planner_${courseId}`, JSON.stringify(plannerSettings));
+    } catch {
+      // ignore
+    }
+    setPlannerSavedToast(true);
+    setTimeout(() => setPlannerSavedToast(false), 3000);
+  };
+
+  const handleAddToGoogleCalendar = () => {
+    const title = `Study: ${course?.title || "EduPlatform Course"}`;
+    const details = `Dedicated EduPlatform study session for "${course?.title}".\nTarget Completion: ${projectedGraduationInfo.dateStr}\nRemaining lessons: ${remainingLessonsCount}\nClassroom: ${window.location.href}`;
+    const location = "EduPlatform Virtual Classroom";
+
+    const now = new Date();
+    const [hours, minutes] = (plannerSettings.preferredTime || "19:00").split(":").map(Number);
+    const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, hours || 19, minutes || 0);
+    const endTime = new Date(startTime.getTime() + minutesPerSession * 60 * 1000);
+
+    const pad = (n) => String(n).padStart(2, "0");
+    const formatGCal = (d) =>
+      `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
+
+    const startStr = formatGCal(startTime);
+    const endStr = formatGCal(endTime);
+
+    const dayMap = { Mon: "MO", Tue: "TU", Wed: "WE", Thu: "TH", Fri: "FR", Sat: "SA", Sun: "SU" };
+    const rruleDays = (plannerSettings.preferredDays || []).map((d) => dayMap[d]).filter(Boolean).join(",");
+    const recurRule = rruleDays ? `RRULE:FREQ=WEEKLY;BYDAY=${rruleDays}` : "RRULE:FREQ=WEEKLY";
+
+    const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+      title
+    )}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(
+      location
+    )}&dates=${startStr}/${endStr}&recur=${encodeURIComponent(recurRule)}`;
+
+    window.open(gcalUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleDownloadIcs = () => {
+    const title = `EduPlatform Study: ${course?.title || "Course"}`;
+    const description = `Dedicated EduPlatform study session.\\nTarget Completion: ${projectedGraduationInfo.dateStr}\\nCourse: ${course?.title}\\nClassroom URL: ${window.location.href}`;
+    const location = "EduPlatform Virtual Classroom";
+
+    const now = new Date();
+    const [hours, minutes] = (plannerSettings.preferredTime || "19:00").split(":").map(Number);
+    const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, hours || 19, minutes || 0);
+    const endTime = new Date(startTime.getTime() + minutesPerSession * 60 * 1000);
+
+    const pad = (n) => String(n).padStart(2, "0");
+    const formatIcs = (d) =>
+      `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
+
+    const dayMap = { Mon: "MO", Tue: "TU", Wed: "WE", Thu: "TH", Fri: "FR", Sat: "SA", Sun: "SU" };
+    const rruleDays = (plannerSettings.preferredDays || []).map((d) => dayMap[d]).filter(Boolean).join(",");
+    const rruleClause = rruleDays ? `RRULE:FREQ=WEEKLY;BYDAY=${rruleDays}` : "RRULE:FREQ=WEEKLY";
+
+    const icsContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//EduPlatform//Smart Study Planner//EN",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      `UID:edu-study-${courseId}-${Date.now()}@eduplatform.com`,
+      `DTSTAMP:${formatIcs(new Date())}`,
+      `DTSTART:${formatIcs(startTime)}`,
+      `DTEND:${formatIcs(endTime)}`,
+      rruleClause,
+      `SUMMARY:${title}`,
+      `DESCRIPTION:${description}`,
+      `LOCATION:${location}`,
+      "STATUS:CONFIRMED",
+      "BEGIN:VALARM",
+      "TRIGGER:-PT15M",
+      "ACTION:DISPLAY",
+      "DESCRIPTION:EduPlatform Learning Session in 15 minutes",
+      "END:VALARM",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `study-schedule-${(course?.title || "course").slice(0, 18).toLowerCase().replace(/[^a-z0-9]/g, "-")}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const handleLessonSelect = (modIdx, lesIdx) => {
     setCurrentModuleIndex(modIdx);
     setCurrentLessonIndex(lesIdx);
@@ -1238,6 +1420,18 @@ export default function CoursePlayer() {
             <span>Leaderboard</span>
           </Link>
 
+          {/* Smart Study Planner Button */}
+          <button
+            type="button"
+            onClick={() => setShowPlannerModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 text-xs font-bold transition shadow-xs cursor-pointer"
+            title="Smart Study Planner & Schedule"
+          >
+            <FaCalendarAlt className="text-purple-600 text-xs" />
+            <span className="hidden sm:inline">Study Planner</span>
+            <span className="sm:hidden">Plan</span>
+          </button>
+
           {progressPercent === 100 && (
             <button
               onClick={() => setShowCertificateModal(true)}
@@ -1378,7 +1572,32 @@ export default function CoursePlayer() {
               {/* Tab Body */}
               <div className="p-6">
                 {activeTab === "overview" && (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
+                    {/* Paced Study Habit Banner */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-purple-50/80 via-indigo-50/50 to-white border border-purple-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center text-lg flex-shrink-0 shadow-xs">
+                          <FaCalendarAlt />
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-purple-700">
+                            Paced Study Goal &bull; {plannerSettings.streakDays}-Day Streak 🔥
+                          </div>
+                          <div className="text-xs sm:text-sm font-bold text-slate-900">
+                            Target Graduation: <span className="text-purple-700 font-extrabold">{projectedGraduationInfo.dateStr}</span> ({projectedGraduationInfo.weeksFormatted})
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowPlannerModal(true)}
+                        className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5 self-start sm:self-auto cursor-pointer flex-shrink-0"
+                      >
+                        <FaCalendarPlus className="text-xs" />
+                        <span>Adjust Pace &amp; Sync</span>
+                      </button>
+                    </div>
+
                     <h3 className="text-lg font-bold text-slate-900">{currentLesson?.title}</h3>
                     <p className="text-slate-600 text-sm leading-relaxed">
                       {currentLesson?.description ||
@@ -2362,6 +2581,247 @@ export default function CoursePlayer() {
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── 5. SMART STUDY PLANNER MODAL ─────────────────────────────── */}
+      {showPlannerModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-2xl space-y-6 my-auto animate-in fade-in zoom-in duration-200">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 border-b border-slate-800 pb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl shadow-inner">
+                  <FaCalendarAlt />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                    <span>Smart Study Planner</span>
+                    <span className="px-2 py-0.5 rounded-md bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-bold uppercase tracking-wider">
+                      Goal Sync
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 font-medium">
+                    Personalized pacing, projected graduation date, and 1-click calendar sync
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPlannerModal(false)}
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
+                title="Close Planner"
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* Streak & Momentum Banner */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-transparent border border-amber-500/30 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+                  <FaFire className="animate-bounce" />
+                </div>
+                <div>
+                  <div className="text-xs font-black text-amber-300">
+                    {plannerSettings.streakDays}-Day Learning Streak Active!
+                  </div>
+                  <div className="text-[11px] text-slate-300">
+                    Studying consistently increases graduation rates by 3.8x.
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-[11px] font-bold text-amber-400 bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/30">
+                  +50 Streak XP
+                </span>
+              </div>
+            </div>
+
+            {/* Projection Billboard */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-center space-y-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Target Graduation
+                </div>
+                <div className="text-sm sm:text-base font-black text-purple-400">
+                  {projectedGraduationInfo.dateStr}
+                </div>
+                <div className="text-[11px] text-slate-400 font-medium">
+                  {projectedGraduationInfo.weeksFormatted}
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-center space-y-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Remaining Content
+                </div>
+                <div className="text-base sm:text-lg font-black text-emerald-400">
+                  {estimatedRemainingHours} Hours
+                </div>
+                <div className="text-[11px] text-slate-400 font-medium">
+                  {remainingLessonsCount} lessons left
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-center space-y-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Session Commitment
+                </div>
+                <div className="text-base sm:text-lg font-black text-amber-400">
+                  ~{minutesPerSession} mins
+                </div>
+                <div className="text-[11px] text-slate-400 font-medium">
+                  per study day
+                </div>
+              </div>
+            </div>
+
+            {/* Weekly Pace Selector */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-200">
+                  Weekly Study Commitment
+                </label>
+                <span className="text-xs font-black text-purple-400 bg-purple-500/20 px-2.5 py-0.5 rounded-lg border border-purple-500/30">
+                  {plannerSettings.weeklyHours} hours / week
+                </span>
+              </div>
+
+              {/* Preset Pace Chips */}
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: "Steady", hours: 1.5, desc: "Relaxed pace" },
+                  { label: "Balanced", hours: 3, desc: "Recommended" },
+                  { label: "Sprint", hours: 6, desc: "Fast completion" },
+                ].map((preset) => {
+                  const isSelected = plannerSettings.weeklyHours === preset.hours;
+                  return (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => handleUpdatePlanner("weeklyHours", preset.hours)}
+                      className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
+                        isSelected
+                          ? "bg-purple-600/30 border-purple-500 text-white shadow-sm"
+                          : "bg-slate-800/60 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span>{preset.label}</span>
+                        <span className="text-[11px] opacity-80">{preset.hours}h/wk</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{preset.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Custom Slider */}
+              <div className="pt-2">
+                <input
+                  type="range"
+                  min="1"
+                  max="12"
+                  step="0.5"
+                  value={plannerSettings.weeklyHours}
+                  onChange={(e) => handleUpdatePlanner("weeklyHours", parseFloat(e.target.value))}
+                  className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                />
+                <div className="flex justify-between text-[10px] text-slate-500 font-medium px-1 mt-1">
+                  <span>1 hr/wk</span>
+                  <span>4 hrs/wk</span>
+                  <span>8 hrs/wk</span>
+                  <span>12 hrs/wk</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Study Days & Preferred Time */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              {/* Preferred Days */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-200">
+                  Target Study Days
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => {
+                    const isSelected = plannerSettings.preferredDays?.includes(day);
+                    return (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => handleTogglePlannerDay(day)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                          isSelected
+                            ? "bg-purple-600 text-white shadow-xs"
+                            : "bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700"
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Reminder Time */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <FaBell className="text-purple-400 text-xs" />
+                  <span>Session Reminder Time</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="time"
+                    value={plannerSettings.preferredTime || "19:00"}
+                    onChange={(e) => handleUpdatePlanner("preferredTime", e.target.value)}
+                    className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-purple-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSavePlanner}
+                    className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition cursor-pointer flex-shrink-0"
+                  >
+                    {plannerSavedToast ? "Saved!" : "Save"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Calendar Export & Sync Actions Strip */}
+            <div className="border-t border-slate-800 pt-5 space-y-3">
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                Sync with your calendar app
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={handleAddToGoogleCalendar}
+                  className="px-4 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center justify-center gap-2.5 shadow-lg shadow-blue-600/20 cursor-pointer"
+                >
+                  <FaCalendarPlus className="text-sm" />
+                  <span>Add to Google Calendar</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadIcs}
+                  className="px-4 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 hover:text-white text-xs font-bold transition flex items-center justify-center gap-2.5 cursor-pointer"
+                >
+                  <FaDownload className="text-xs" />
+                  <span>Download .ics (Apple / Outlook)</span>
+                </button>
+              </div>
+
+              {plannerSavedToast && (
+                <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold text-center animate-in fade-in duration-150">
+                  ✓ Study plan and calendar preferences updated successfully!
+                </div>
+              )}
             </div>
           </div>
         </div>
