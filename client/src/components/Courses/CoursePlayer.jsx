@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
@@ -24,10 +24,17 @@ import {
   FaCheck,
   FaFolderOpen,
   FaTimes,
+  FaRobot,
+  FaPaperPlane,
+  FaLightbulb,
+  FaCopy,
+  FaTrashAlt,
+  FaMagic,
 } from "react-icons/fa";
 import { getCourseById } from "../../services/courseService";
 import AlertMessage from "../Alert/AlertMessage";
 import { getRealCourseById } from "../../data/realCourses";
+import chatbotService from "../../services/chatbotService";
 
 // YouTube Video Player Component
 const YouTubePlayer = ({ videoId, onProgress, onComplete, initialTime = 0 }) => {
@@ -110,6 +117,120 @@ const YouTubePlayer = ({ videoId, onProgress, onComplete, initialTime = 0 }) => 
   );
 };
 
+// Helper for parsing **bold** styling
+const parseBold = (str) => {
+  if (!str) return "";
+  const parts = str.split(/(\*\*.*?\*\*)/g);
+  return parts.map((seg, i) => {
+    if (seg.startsWith("**") && seg.endsWith("**")) {
+      return (
+        <strong key={i} className="font-bold text-slate-900">
+          {seg.slice(2, -2)}
+        </strong>
+      );
+    }
+    return seg;
+  });
+};
+
+// Rich Markdown / Code Message Formatter for AI Copilot
+const CopilotMessageBody = ({ content, onCopyCode, copiedCodeId }) => {
+  if (!content) return null;
+
+  // Split by ``` code blocks
+  const segments = content.split(/(```[\s\S]*?```)/g);
+
+  return (
+    <div className="space-y-3 text-xs sm:text-sm text-slate-800 leading-relaxed font-sans">
+      {segments.map((segment, sIdx) => {
+        if (segment.startsWith("```") && segment.endsWith("```")) {
+          const lines = segment.slice(3, -3).trim().split("\n");
+          const lang = lines[0]?.trim() || "";
+          const code = (lang ? lines.slice(1) : lines).join("\n");
+          const blockId = `code-${sIdx}`;
+          const isCopied = copiedCodeId === blockId;
+
+          return (
+            <div
+              key={sIdx}
+              className="my-3 rounded-xl overflow-hidden bg-slate-950 text-slate-100 border border-slate-800 shadow-md"
+            >
+              <div className="flex items-center justify-between px-3.5 py-2 bg-slate-900 border-b border-slate-800 text-[11px] text-slate-400">
+                <span className="font-mono font-semibold uppercase text-indigo-400">
+                  {lang || "code"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onCopyCode(code, blockId)}
+                  className="flex items-center gap-1.5 text-slate-400 hover:text-white transition px-2 py-0.5 rounded hover:bg-slate-800 cursor-pointer"
+                >
+                  <FaCopy className="text-xs" />
+                  <span>{isCopied ? "Copied!" : "Copy code"}</span>
+                </button>
+              </div>
+              <pre className="p-4 font-mono text-xs overflow-x-auto text-emerald-300 leading-normal">
+                <code>{code}</code>
+              </pre>
+            </div>
+          );
+        }
+
+        const lines = segment.split("\n");
+        return (
+          <div key={sIdx} className="space-y-2">
+            {lines.map((line, lIdx) => {
+              const trimmed = line.trim();
+              if (!trimmed) return null;
+
+              if (trimmed.startsWith("### ")) {
+                return (
+                  <h4 key={lIdx} className="text-sm font-black text-slate-900 pt-2 pb-0.5">
+                    {trimmed.replace("### ", "")}
+                  </h4>
+                );
+              }
+
+              if (trimmed.startsWith("## ")) {
+                return (
+                  <h3 key={lIdx} className="text-base font-black text-slate-900 pt-2 pb-0.5">
+                    {trimmed.replace("## ", "")}
+                  </h3>
+                );
+              }
+
+              if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+                return (
+                  <div key={lIdx} className="flex items-start gap-2 pl-2">
+                    <span className="text-indigo-600 font-bold mt-0.5">&bull;</span>
+                    <span className="text-slate-700">{parseBold(trimmed.slice(2))}</span>
+                  </div>
+                );
+              }
+
+              if (trimmed.startsWith("> ")) {
+                return (
+                  <div
+                    key={lIdx}
+                    className="p-3 my-1.5 rounded-xl bg-indigo-50/80 border-l-4 border-indigo-600 text-indigo-950 font-medium text-xs"
+                  >
+                    {parseBold(trimmed.replace("> ", ""))}
+                  </div>
+                );
+              }
+
+              return (
+                <p key={lIdx} className="text-slate-700">
+                  {parseBold(trimmed)}
+                </p>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export default function CoursePlayer() {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -138,6 +259,20 @@ export default function CoursePlayer() {
   });
   const [showCertificateModal, setShowCertificateModal] = useState(false);
 
+  // Copilot State
+  const [copilotMessages, setCopilotMessages] = useState(() => [
+    {
+      id: "welcome",
+      isBot: true,
+      text: "👋 Hi! I'm your **AI Lecture Copilot**. I'm actively following along with this lesson. Ask me anything, or tap one of the quick prompts below!",
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    },
+  ]);
+  const [copilotInput, setCopilotInput] = useState("");
+  const [isCopilotLoading, setIsCopilotLoading] = useState(false);
+  const [copiedCodeId, setCopiedCodeId] = useState(null);
+  const copilotChatEndRef = useRef(null);
+
   useEffect(() => {
     try {
       localStorage.setItem(`edu_progress_${courseId}`, JSON.stringify(progress));
@@ -153,6 +288,13 @@ export default function CoursePlayer() {
       // ignore
     }
   }, [courseId, savedNotes]);
+
+  // Auto-scroll copilot messages
+  useEffect(() => {
+    if (activeTab === "copilot" && copilotChatEndRef.current) {
+      copilotChatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [copilotMessages, activeTab, isCopilotLoading]);
 
   // Fetch course
   const { data: courseData, isLoading, error } = useQuery({
@@ -316,6 +458,77 @@ export default function CoursePlayer() {
     setNotes("");
   };
 
+  // AI Copilot Actions
+  const handleSendCopilotMessage = async (customQuery) => {
+    const query = (customQuery || copilotInput).trim();
+    if (!query || isCopilotLoading) return;
+
+    const userMsg = {
+      id: `user-${Date.now()}`,
+      isBot: false,
+      text: query,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setCopilotMessages((prev) => [...prev, userMsg]);
+    if (!customQuery) setCopilotInput("");
+    setIsCopilotLoading(true);
+
+    try {
+      const response = await chatbotService.askLectureCopilot({
+        courseTitle: course?.title,
+        moduleTitle: currentModule?.title,
+        lessonTitle: currentLesson?.title,
+        lessonDescription: currentLesson?.description,
+        query,
+        history: copilotMessages,
+      });
+
+      const botMsg = {
+        id: `bot-${Date.now()}`,
+        isBot: true,
+        text: response.text,
+        source: response.source,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+      setCopilotMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      console.error("Copilot error:", err);
+      setCopilotMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-err-${Date.now()}`,
+          isBot: true,
+          text: "I experienced a brief connection hiccup. Review the key lecture takeaways and test the module in your local editor!",
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        },
+      ]);
+    } finally {
+      setIsCopilotLoading(false);
+    }
+  };
+
+  const handleCopyCode = (code, blockId) => {
+    try {
+      navigator.clipboard.writeText(code);
+      setCopiedCodeId(blockId);
+      setTimeout(() => setCopiedCodeId(null), 2500);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleClearCopilotChat = () => {
+    setCopilotMessages([
+      {
+        id: "welcome-reset",
+        isBot: true,
+        text: `Conversation cleared. How can I assist you with **${currentLesson?.title || "this lesson"}**?`,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      },
+    ]);
+  };
+
   if (isLoading && !fallbackCourse) {
     return (
       <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
@@ -467,6 +680,7 @@ export default function CoursePlayer() {
               <div className="flex items-center border-b border-slate-200 px-4 sm:px-6 bg-slate-50/80 gap-6">
                 {[
                   { id: "overview", label: "Overview", icon: <FaBookOpen /> },
+                  { id: "copilot", label: "AI Copilot", icon: <FaRobot />, badge: "AI" },
                   { id: "resources", label: "Resources & Files", icon: <FaFolderOpen /> },
                   { id: "notes", label: "Notes", icon: <FaStickyNote /> },
                   { id: "qa", label: "Q&A Forum", icon: <FaQuestionCircle /> },
@@ -474,7 +688,7 @@ export default function CoursePlayer() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`py-4 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition ${
+                    className={`py-4 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition relative ${
                       activeTab === tab.id
                         ? "border-indigo-600 text-indigo-600"
                         : "border-transparent text-slate-500 hover:text-slate-800"
@@ -482,6 +696,11 @@ export default function CoursePlayer() {
                   >
                     <span>{tab.icon}</span>
                     <span>{tab.label}</span>
+                    {tab.badge && (
+                      <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase shadow-xs">
+                        {tab.badge}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -500,6 +719,168 @@ export default function CoursePlayer() {
                       <span>Skill Level: <strong className="text-indigo-600">{course.difficulty || "All Levels"}</strong></span>
                       <span>Estimated Time: <strong className="text-slate-800">20 mins</strong></span>
                     </div>
+                  </div>
+                )}
+
+                {/* ─── AI COPILOT TAB ──────────────────────────────────── */}
+                {activeTab === "copilot" && (
+                  <div className="space-y-5">
+                    {/* Active Context Bar */}
+                    <div className="p-3.5 bg-gradient-to-r from-indigo-50 via-purple-50 to-white rounded-2xl border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                          <FaRobot className="text-sm" />
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-600">
+                            Active Lecture Companion
+                          </div>
+                          <div className="text-xs font-bold text-slate-900 line-clamp-1">
+                            {currentLesson?.title || "Current Lecture"}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleClearCopilotChat}
+                        className="text-[11px] text-slate-500 hover:text-rose-600 flex items-center gap-1 font-semibold transition self-start sm:self-auto cursor-pointer"
+                        title="Clear conversation"
+                      >
+                        <FaTrashAlt className="text-[10px]" />
+                        <span>Clear Chat</span>
+                      </button>
+                    </div>
+
+                    {/* Quick Prompt Chips */}
+                    <div className="space-y-1.5">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <FaMagic className="text-indigo-500 text-[10px]" />
+                        <span>Quick Questions &amp; Prompts</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          {
+                            label: "📋 Summarize this lecture",
+                            prompt: "Summarize the key concepts and core takeaways from this lecture in clear bullet points.",
+                          },
+                          {
+                            label: "💡 Explain key concepts",
+                            prompt: "Explain the main mechanics and architecture of this lesson in simple terms.",
+                          },
+                          {
+                            label: "💻 Code example",
+                            prompt: "Provide a clean, production-ready code implementation illustrating this lesson.",
+                          },
+                          {
+                            label: "🧠 Quiz my understanding",
+                            prompt: "Ask me 2 practical questions to test my understanding of this topic, with explanations.",
+                          },
+                          {
+                            label: "🚀 Industry use cases",
+                            prompt: "How do modern tech companies apply this exact pattern in real-world production projects?",
+                          },
+                        ].map((chip, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            disabled={isCopilotLoading}
+                            onClick={() => handleSendCopilotMessage(chip.prompt)}
+                            className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 text-slate-700 hover:text-indigo-700 border border-slate-200 transition shadow-2xs disabled:opacity-50 cursor-pointer"
+                          >
+                            {chip.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Chat Messages Stream */}
+                    <div className="space-y-3.5 max-h-[420px] overflow-y-auto pr-1">
+                      {copilotMessages.map((msg) => (
+                        <div
+                          key={msg.id}
+                          className={`flex gap-3 ${msg.isBot ? "items-start" : "items-start justify-end"}`}
+                        >
+                          {msg.isBot && (
+                            <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 text-xs shadow-xs mt-1">
+                              <FaRobot />
+                            </div>
+                          )}
+
+                          <div
+                            className={`max-w-[85%] rounded-2xl p-4 shadow-2xs ${
+                              msg.isBot
+                                ? "bg-white border border-slate-200 text-slate-800"
+                                : "bg-indigo-600 text-white"
+                            }`}
+                          >
+                            {msg.isBot ? (
+                              <CopilotMessageBody
+                                content={msg.text}
+                                onCopyCode={handleCopyCode}
+                                copiedCodeId={copiedCodeId}
+                              />
+                            ) : (
+                              <p className="text-xs sm:text-sm font-medium leading-relaxed whitespace-pre-wrap">
+                                {msg.text}
+                              </p>
+                            )}
+                            <div
+                              className={`text-[10px] mt-2 font-medium flex items-center justify-end gap-1 ${
+                                msg.isBot ? "text-slate-400" : "text-indigo-200"
+                              }`}
+                            >
+                              <span>{msg.timestamp}</span>
+                            </div>
+                          </div>
+
+                          {!msg.isBot && (
+                            <div className="w-7 h-7 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs mt-1">
+                              {(userProfile?.username || "You")[0].toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* Loading Typing Indicator */}
+                      {isCopilotLoading && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 text-xs shadow-xs">
+                            <FaRobot />
+                          </div>
+                          <div className="bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs text-indigo-600 font-semibold flex items-center gap-2 shadow-2xs">
+                            <span className="w-2 h-2 rounded-full bg-indigo-600 animate-ping" />
+                            <span>AI Copilot is analyzing lecture context...</span>
+                          </div>
+                        </div>
+                      )}
+                      <div ref={copilotChatEndRef} />
+                    </div>
+
+                    {/* Chat Input Bar */}
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSendCopilotMessage();
+                      }}
+                      className="flex items-center gap-2 pt-2 border-t border-slate-100"
+                    >
+                      <input
+                        type="text"
+                        value={copilotInput}
+                        onChange={(e) => setCopilotInput(e.target.value)}
+                        placeholder={`Ask a question about ${currentLesson?.title || "this lesson"}...`}
+                        disabled={isCopilotLoading}
+                        className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition disabled:opacity-60"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!copilotInput.trim() || isCopilotLoading}
+                        className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-indigo-600/20 transition flex items-center gap-2 disabled:opacity-40 cursor-pointer"
+                      >
+                        <FaPaperPlane className="text-xs" />
+                        <span className="hidden sm:inline">Send</span>
+                      </button>
+                    </form>
                   </div>
                 )}
 
