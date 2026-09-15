@@ -537,6 +537,126 @@ export default function CoursePlayer() {
 
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
+
+  // Fetch course
+  const { data: courseData, isLoading, error } = useQuery({
+    queryKey: ["course", courseId],
+    queryFn: () => getCourseById(courseId),
+    enabled: !!courseId,
+    retry: false,
+  });
+
+  const fallbackCourse = getRealCourseById(courseId);
+  const course = courseData || fallbackCourse;
+
+  // Normalize curriculum to always have playable modules and lessons
+  const modules = useMemo(() => {
+    if (course?.modules && course.modules.length > 0) {
+      return course.modules;
+    }
+    if (course?.sections && course.sections.length > 0) {
+      return course.sections.map((sec, sIdx) => ({
+        _id: sec._id || `sec-${sIdx}`,
+        title: `${sIdx + 1}. ${sec.sectionName || `Section ${sIdx + 1}`}`,
+        lessons: (sec.lectures && sec.lectures.length > 0)
+          ? sec.lectures.map((lec, lIdx) => ({
+              _id: `${sec._id || sIdx}-lec-${lIdx}`,
+              title: lec.title || `Lecture ${lIdx + 1}`,
+              type: "video",
+              description: `Comprehensive video lecture covering ${lec.title || `Lecture ${lIdx + 1}`}.`,
+              content: {
+                videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
+                youtubeId: "SqcY0GlETPk",
+                videoDuration: 900,
+                textContent: `Welcome to ${lec.title || `Lecture ${lIdx + 1}`}. In this lesson, we break down core architectural principles, analyze best practices, and work through hands-on code examples.`,
+              },
+            }))
+          : [
+              {
+                _id: `${sec._id || sIdx}-lec-0`,
+                title: `${sec.sectionName || `Lesson 1`} - Core Concepts`,
+                type: "video",
+                description: `Comprehensive instruction and walkthrough for ${sec.sectionName || `Section ${sIdx + 1}`}.`,
+                content: {
+                  videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
+                  youtubeId: "SqcY0GlETPk",
+                  videoDuration: (sec.estimatedTime || 20) * 60,
+                  textContent: `Welcome to ${sec.sectionName || `Section ${sIdx + 1}`}. Review the code breakdown and key principles covered in this module.`,
+                },
+              },
+            ],
+      }));
+    }
+    // Default fallback curriculum
+    return [
+      {
+        _id: "mod-intro",
+        title: "1. Course Introduction & Foundations",
+        lessons: [
+          {
+            _id: "les-1",
+            title: "Course Overview & Learning Strategy",
+            type: "video",
+            description: "High-level orientation of all projects and competencies we will master.",
+            content: {
+              videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
+              youtubeId: "SqcY0GlETPk",
+              videoDuration: 600,
+              textContent: "Welcome to EduPlatform. Follow along with our project repositories.",
+            },
+          },
+          {
+            _id: "les-2",
+            title: "Environment Setup & Architecture Design",
+            type: "text",
+            description: "Setting up your developer workstation and project configurations.",
+            content: {
+              textContent: "Make sure you have Node.js 18+ and VS Code installed with standard extensions.",
+            },
+          },
+        ],
+      },
+      {
+        _id: "mod-core",
+        title: "2. Deep Dive & Core Implementation",
+        lessons: [
+          {
+            _id: "les-3",
+            title: "Hands-on Practical Architecture",
+            type: "video",
+            description: "Building production-grade modules step by step.",
+            content: {
+              videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
+              youtubeId: "SqcY0GlETPk",
+              videoDuration: 1200,
+              textContent: "Follow along closely as we structure our state and data flow.",
+            },
+          },
+        ],
+      },
+    ];
+  }, [course]);
+
+  const currentModule =
+    (modules && modules[currentModuleIndex]) ||
+    (modules && modules[0]) || {
+      title: "1. Foundations & Architecture",
+      lessons: [],
+    };
+  const currentLessonsList = currentModule?.lessons || [];
+  const currentLesson =
+    currentLessonsList[currentLessonIndex] ||
+    currentLessonsList[0] || {
+      _id: "default-lec",
+      title: "Course Overview & Learning Strategy",
+      type: "video",
+      description: "Welcome to EduPlatform. Follow along with our project repositories.",
+      content: {
+        youtubeId: "SqcY0GlETPk",
+        videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
+        textContent: "Welcome to EduPlatform. Follow along with our curriculum.",
+      },
+    };
   const [progress, setProgress] = useState(() => {
     try {
       const saved = localStorage.getItem(`edu_progress_${courseId}`);
@@ -874,125 +994,7 @@ export default function CoursePlayer() {
     }
   }, [copilotMessages, activeTab, isCopilotLoading]);
 
-  // Fetch course
-  const { data: courseData, isLoading, error } = useQuery({
-    queryKey: ["course", courseId],
-    queryFn: () => getCourseById(courseId),
-    enabled: !!courseId,
-    retry: false,
-  });
 
-  const fallbackCourse = getRealCourseById(courseId);
-  const course = courseData || fallbackCourse;
-
-  // Normalize curriculum to always have playable modules and lessons
-  const modules = useMemo(() => {
-    if (course?.modules && course.modules.length > 0) {
-      return course.modules;
-    }
-    if (course?.sections && course.sections.length > 0) {
-      return course.sections.map((sec, sIdx) => ({
-        _id: sec._id || `sec-${sIdx}`,
-        title: `${sIdx + 1}. ${sec.sectionName || `Section ${sIdx + 1}`}`,
-        lessons: (sec.lectures && sec.lectures.length > 0)
-          ? sec.lectures.map((lec, lIdx) => ({
-              _id: `${sec._id || sIdx}-lec-${lIdx}`,
-              title: lec.title || `Lecture ${lIdx + 1}`,
-              type: "video",
-              description: `Comprehensive video lecture covering ${lec.title || `Lecture ${lIdx + 1}`}.`,
-              content: {
-                videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-                youtubeId: "SqcY0GlETPk",
-                videoDuration: 900,
-                textContent: `Welcome to ${lec.title || `Lecture ${lIdx + 1}`}. In this lesson, we break down core architectural principles, analyze best practices, and work through hands-on code examples.`,
-              },
-            }))
-          : [
-              {
-                _id: `${sec._id || sIdx}-lec-0`,
-                title: `${sec.sectionName || `Lesson 1`} - Core Concepts`,
-                type: "video",
-                description: `Comprehensive instruction and walkthrough for ${sec.sectionName || `Section ${sIdx + 1}`}.`,
-                content: {
-                  videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-                  youtubeId: "SqcY0GlETPk",
-                  videoDuration: (sec.estimatedTime || 20) * 60,
-                  textContent: `Welcome to ${sec.sectionName || `Section ${sIdx + 1}`}. Review the code breakdown and key principles covered in this module.`,
-                },
-              },
-            ],
-      }));
-    }
-    // Default fallback curriculum
-    return [
-      {
-        _id: "mod-intro",
-        title: "1. Course Introduction & Foundations",
-        lessons: [
-          {
-            _id: "les-1",
-            title: "Course Overview & Learning Strategy",
-            type: "video",
-            description: "High-level orientation of all projects and competencies we will master.",
-            content: {
-              videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-              youtubeId: "SqcY0GlETPk",
-              videoDuration: 600,
-              textContent: "Welcome to EduPlatform. Follow along with our project repositories.",
-            },
-          },
-          {
-            _id: "les-2",
-            title: "Environment Setup & Architecture Design",
-            type: "text",
-            description: "Setting up your developer workstation and project configurations.",
-            content: {
-              textContent: "Make sure you have Node.js 18+ and VS Code installed with standard extensions.",
-            },
-          },
-        ],
-      },
-      {
-        _id: "mod-core",
-        title: "2. Deep Dive & Core Implementation",
-        lessons: [
-          {
-            _id: "les-3",
-            title: "Hands-on Practical Architecture",
-            type: "video",
-            description: "Building production-grade modules step by step.",
-            content: {
-              videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-              youtubeId: "SqcY0GlETPk",
-              videoDuration: 1200,
-              textContent: "Follow along closely as we structure our state and data flow.",
-            },
-          },
-        ],
-      },
-    ];
-  }, [course]);
-
-  const currentModule =
-    (modules && modules[currentModuleIndex]) ||
-    (modules && modules[0]) || {
-      title: "1. Foundations & Architecture",
-      lessons: [],
-    };
-  const currentLessonsList = currentModule?.lessons || [];
-  const currentLesson =
-    currentLessonsList[currentLessonIndex] ||
-    currentLessonsList[0] || {
-      _id: "default-lec",
-      title: "Course Overview & Learning Strategy",
-      type: "video",
-      description: "Welcome to EduPlatform. Follow along with our project repositories.",
-      content: {
-        youtubeId: "SqcY0GlETPk",
-        videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-        textContent: "Welcome to EduPlatform. Follow along with our curriculum.",
-      },
-    };
 
   // Calculate total lessons and completion stats
   const totalLessonsCount = useMemo(() => {
